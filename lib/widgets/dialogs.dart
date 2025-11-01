@@ -141,10 +141,10 @@ class _ConnectScaleDialogState extends State<ConnectScaleDialog> with TickerProv
                                 child: Container(
                                   margin: EdgeInsets.all(20),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    gradient: LinearGradient(colors: [Color.fromARGB(255, 132, 162, 254), Color.fromARGB(255, 158, 91, 187)]),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: Center(child: Text('⚖️', style: TextStyle(fontSize: 48))),
+                                  child: Center(child: Image.asset('assets/img/Composition Scale.png', width: 80, height: 80)),
                                 ),
                               ),
                             ],
