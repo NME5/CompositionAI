@@ -37,28 +37,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         return SafeArea(
           child: Column(
             children: [
-              // Status Bar Simulation
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('9:41', style: TextStyle(fontWeight: FontWeight.w500)),
-                    Row(
-                      children: [
-                        Container(width: 16, height: 8, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
-                        SizedBox(width: 4),
-                        Container(
-                          width: 24, height: 12,
-                          decoration: BoxDecoration(border: Border.all(color: Colors.grey[300]!), borderRadius: BorderRadius.circular(2)),
-                          child: Container(margin: EdgeInsets.all(2), decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(1))),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              
               // Header
               Padding(
                 padding: EdgeInsets.all(24),
@@ -154,6 +132,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ],
                       ),
                     ),
+
+                    // Start Weighing Button
+                    Container(
+                      padding: EdgeInsets.only(top: 10),
+                      height: 55, //aman ga
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF667EEA),
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: Text('Start Weighing', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+
                   ],
                 ),
               ),
