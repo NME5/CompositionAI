@@ -34,12 +34,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return AnimatedBuilder(
       animation: _viewModel,
       builder: (context, child) {
-        return SafeArea(
+        return SafeArea( //nanti bikin space safearea, tapi kalo discroll bisa sampe diatas safearea
           child: Column(
             children: [
               // Header
               Padding(
-                padding: EdgeInsets.all(24),
+                padding: EdgeInsets.fromLTRB(24, 32, 24, 24),
                 child: Column(
                   children: [
                     Row(
@@ -61,8 +61,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: const Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: const Image(image: AssetImage('assets/img/Logo CompositionAI.png'),),
+                            padding: EdgeInsets.all(8.0),
+                            child: Image(image: AssetImage('assets/img/Logo CompositionAI.png'),),
                           ),
                         ),
                       ],

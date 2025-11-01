@@ -34,37 +34,38 @@ class _InsightsPageState extends State<InsightsPage> {
         return SafeArea(
           child: Column(
             children: [
-              // Header
-              Padding(
-                padding: EdgeInsets.fromLTRB(24, 32, 24, 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('AI Insights', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 4),
-                        Text('Personalized recommendations', style: TextStyle(color: Colors.grey[600])),
-                      ],
-                    ),
-                    Container(
-                      width: 48, height: 48,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [Color(0xFFF093FB), Color(0xFFF5576C)]),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Center(child: Text('🧠', style: TextStyle(fontSize: 20))),
-                    ),
-                  ],
-                ),
-              ),
-              
+            
               Expanded(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     children: [
+                      // Header
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(0, 32, 0, 24),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('AI Insights', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                                SizedBox(height: 4),
+                                Text('Personalized recommendations', style: TextStyle(color: Colors.grey[600])),
+                              ],
+                            ),
+                            Container(
+                              width: 48, height: 48,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(colors: [Color(0xFFF093FB), Color(0xFFF5576C)]),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Center(child: Text('🧠', style: TextStyle(fontSize: 20))),
+                            ),
+                          ],
+                        ),
+                      ),
+
                       // AI Summary
                       Container(
                         padding: EdgeInsets.all(24),
