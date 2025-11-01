@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'pages/home_page.dart';
-import 'pages/analytics_page.dart';
-import 'pages/insights_page.dart';
-import 'pages/profile_page.dart';
+import 'views/home_page.dart';
+import 'views/analytics_page.dart';
+import 'views/insights_page.dart';
+import 'views/profile_page.dart';
 import 'widgets/dialogs.dart';
 
 void main() {
