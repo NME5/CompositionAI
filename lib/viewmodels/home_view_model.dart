@@ -6,7 +6,7 @@ class HomeViewModel extends ChangeNotifier {
   bool _isScanning = false;
   int _currentStep = 0;
   double _progress = 0.0;
-  String _deviceName = 'Bluetooth 1234';
+  String _deviceName = 'No Scale Connected';
   bool _showUnbindButton = true;
 
   bool get isConnected => _isConnected;

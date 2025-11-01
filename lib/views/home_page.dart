@@ -238,16 +238,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _showConnectDialog() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ConnectScaleDialog(
-        onConnected: (deviceName) {
-          _viewModel.bindScale(deviceName: deviceName);
-          Navigator.pop(context);
-        },
-      ),
+    ConnectScaleDialog.show(
+      context,
+      onConnected: (deviceName) {
+        _viewModel.bindScale(deviceName: deviceName);
+      },
     );
   }
 
