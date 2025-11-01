@@ -112,23 +112,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Scale Status', style: TextStyle(fontWeight: FontWeight.w500)),
-                                  Text(_viewModel.isConnected ? 'Connected' : 'Not Connected', 
+                                  Text(_viewModel.deviceName, style: TextStyle(fontWeight: FontWeight.w500)),
+                                  Text(_viewModel.isConnected ? 'Binded' : 'Not Binded', 
                                        style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                                 ],
                               ),
                             ],
                           ),
-                          ElevatedButton(
-                            onPressed: () => _showConnectDialog(),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _viewModel.isConnected ? Colors.green : Color(0xFF667EEA),
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          
+                          if(_viewModel.showUnbindButton && _viewModel.isConnected)
+                            ElevatedButton(
+                              onPressed: () {
+                                _viewModel.unbindScale();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF9E7AE8), // Soft purple/lavender
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: Text('Unbind', style: TextStyle(fontSize: 14)),
                             ),
-                            child: Text(_viewModel.isConnected ? 'Connected' : 'Connect', style: TextStyle(fontSize: 14)),
-                          ),
                         ],
                       ),
                     ),
@@ -139,7 +143,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       height: 55, //aman ga
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () => _showConnectDialog(),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF667EEA),
                           foregroundColor: Colors.white,
@@ -239,8 +243,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => ConnectScaleDialog(
-        onConnected: () {
-          _viewModel.toggleConnection();
+        onConnected: (deviceName) {
+          _viewModel.bindScale(deviceName: deviceName);
           Navigator.pop(context);
         },
       ),

@@ -4,7 +4,7 @@ import '../models/device.dart';
 import '../services/data_service.dart';
 
 class ConnectScaleDialog extends StatefulWidget {
-  final VoidCallback onConnected;
+  final Function(String deviceName) onConnected;
   
   const ConnectScaleDialog({required this.onConnected});
 
@@ -263,7 +263,11 @@ class _ConnectScaleDialogState extends State<ConnectScaleDialog> with TickerProv
     setState(() => _isConnecting = true);
     
     Future.delayed(Duration(seconds: 2), () {
-      widget.onConnected();
+      if (_selectedDevice >= 0) {
+        final devices = _dataService.getAvailableDevices();
+        final deviceName = devices[_selectedDevice].name;
+        widget.onConnected(deviceName);
+      }
       setState(() => _isConnecting = false);
     });
   }
