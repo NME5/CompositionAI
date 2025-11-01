@@ -45,84 +45,100 @@ class _ConnectScaleDialogState extends State<ConnectScaleDialog> with TickerProv
         children: [
           // Header
           Padding(
-            padding: EdgeInsets.all(24),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.close),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.grey[100],
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                ),
-                Text('Connect Scale', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                SizedBox(width: 48),
-              ],
-            ),
-          ),
-          
-          // Scanning Animation
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 48),
+            padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
             child: Column(
               children: [
-                Stack(
-                  alignment: Alignment.center,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    AnimatedBuilder(
-                      animation: _scanController,
-                      builder: (context, child) {
-                        return Transform.scale(
-                          scale: 1 + (_scanController.value * 0.3),
-                          child: Container(
-                            width: 150,
-                            height: 150,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Container(
-                              margin: EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(child: Text('⚖️', style: TextStyle(fontSize: 48))),
-                            ),
-                          ),
-                        );
-                      },
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.close),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.grey[200],
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
                     ),
+
+                    Text('Connect Scale', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    SizedBox(width: 48),
                   ],
                 ),
-                SizedBox(height: 32),
-                Text('Searching for Devices', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                SizedBox(height: 8),
-                Text('Make sure your BIA scale is powered on and in pairing mode', 
-                     style: TextStyle(color: Colors.grey[600]), textAlign: TextAlign.center),
+
+                SizedBox(height: 10),
+
+                Divider(color: Colors.grey[200], height: 1),
               ],
             ),
           ),
           
-          // Available Devices
+          // Scanning Animation & Available Devices (Scrollable)
           Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
+            child: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Available Devices', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 16),
-                  ..._dataService.getAvailableDevices().asMap().entries.map((entry) {
-                    final device = entry.value;
-                    final index = entry.key;
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: 12),
-                      child: _buildDeviceItem(index, device),
-                    );
-                  }).toList(),
+                  // Scanning Animation
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 48),
+                    child: Column(
+                      children: [
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            AnimatedBuilder(
+                              animation: _scanController,
+                              builder: (context, child) {
+                                return Transform.scale(
+                                  scale: 1 + (_scanController.value * 0.3),
+                                  child: Container(
+                                    width: 150,
+                                    height: 150,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Container(
+                                      margin: EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(child: Text('⚖️', style: TextStyle(fontSize: 48))),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 32),
+                        Text('Searching for Devices', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 8),
+                        Text('Make sure your BIA scale is powered on and in pairing mode', 
+                             style: TextStyle(color: Colors.grey[600]), textAlign: TextAlign.center),
+                      ],
+                    ),
+                  ),
+                  
+                  // Available Devices
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Available Devices', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 16),
+                        ..._dataService.getAvailableDevices().asMap().entries.map((entry) {
+                          final device = entry.value;
+                          final index = entry.key;
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 12),
+                            child: _buildDeviceItem(index, device),
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

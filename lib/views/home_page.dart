@@ -75,13 +75,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             Text('Smart Body Analysis', style: TextStyle(color: Colors.grey[600])),
                           ],
                         ),
+                        
                         Container(
                           width: 48, height: 48,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: Icon(Icons.flash_on, color: Colors.white, size: 24),
+                          child: const Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: const Image(image: AssetImage('assets/img/Logo CompositionAI.png'),),
+                          ),
                         ),
                       ],
                     ),
