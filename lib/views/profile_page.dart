@@ -15,6 +15,12 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _viewModel = ProfileViewModel();
+    // Initialize view model with data from service
+    final profile = _dataService.getUserProfile();
+    _viewModel.updateAge(profile.age);
+    _viewModel.updateHeight(profile.height);
+    _viewModel.updateWeight(profile.weight);
+    _viewModel.updateActivityLevel(profile.activityLevel);
   }
 
   @override
@@ -35,125 +41,126 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [  
               Expanded(
                 child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // Header
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(24, 32, 24, 24),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Profile', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-                                SizedBox(height: 4),
-                                Text('Personal settings & preferences', style: TextStyle(color: Colors.grey[600])),
-                              ],
-                            ),
-                            Container(
-                              width: 48, height: 48,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(colors: [Color(0xFFFFECD2), Color(0xFFFCB69F)]),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Icon(Icons.person, color: Colors.grey[800]),
-                            ),
-                          ],
-                        ),
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: EdgeInsets.fromLTRB(24, 32, 24, 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Profile', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 4),
+                        Text('Personal settings & preferences', style: TextStyle(color: Colors.grey[600])),
+                      ],
+                    ),
+                    Container(
+                      width: 48, height: 48,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [Color(0xFFFFECD2), Color(0xFFFCB69F)]),
+                        borderRadius: BorderRadius.circular(16),
                       ),
-
+                      child: Icon(Icons.person, color: Colors.grey[800]),
+                    ),
+                  ],
+                ),
+              ),
+              
                       // User Info
                       Padding(
                         padding: const EdgeInsets.all(24),
                         child: Column(
                           children: [
-                            Container(
-                              padding: EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.95),
-                                borderRadius: BorderRadius.circular(24),
-                                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20)],
-                              ),
-                              child: Column(
-                                children: [
-                                  Row(
+                      Container(
+                        padding: EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20)],
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 80, height: 80,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  child: Icon(Icons.person, color: Colors.white, size: 40),
+                                ),
+                                SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        width: 80, height: 80,
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
-                                          borderRadius: BorderRadius.circular(24),
-                                        ),
-                                        child: Icon(Icons.person, color: Colors.white, size: 40),
-                                      ),
-                                      SizedBox(width: 16),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(profile.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                                            Text(profile.membershipType, style: TextStyle(color: Colors.grey[600])),
-                                            SizedBox(height: 4),
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.amber[100],
-                                                    borderRadius: BorderRadius.circular(12),
-                                                  ),
-                                                  child: Text('⭐ Gold', style: TextStyle(color: Colors.amber[700], fontSize: 10)),
-                                                ),
-                                                SizedBox(width: 8),
-                                                Text('Member since ${profile.memberSince.year}', style: TextStyle(color: Colors.grey[600], fontSize: 10)),
-                                              ],
+                                      Text(profile.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                      Text(profile.membershipType, style: TextStyle(color: Colors.grey[600])),
+                                      SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.amber[100],
+                                              borderRadius: BorderRadius.circular(12),
                                             ),
-                                          ],
-                                        ),
+                                            child: Text('⭐ Gold', style: TextStyle(color: Colors.amber[700], fontSize: 10)),
+                                          ),
+                                          SizedBox(width: 8),
+                                          Text('Member since ${profile.memberSince.year}', style: TextStyle(color: Colors.grey[600], fontSize: 10)),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 24),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      _buildProfileStat('127', 'Measurements'),
-                                      _buildProfileStat('89', 'Days Active'),
-                                      _buildProfileStat('15', 'Goals Achieved'),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            
                             SizedBox(height: 24),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _buildProfileStat('127', 'Measurements'),
+                                _buildProfileStat('89', 'Days Active'),
+                                _buildProfileStat('15', 'Goals Achieved'),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                             
-                            // Personal Info
-                            _buildInfoSection('Personal Information', [
-                              _buildInfoRow('Age', '${profile.age} years'),
-                              _buildInfoRow('Height', '${profile.height.toStringAsFixed(0)} cm'),
-                              _buildInfoRow('Weight', '${profile.weight} kg'),
-                              _buildInfoRow('Activity Level', profile.activityLevel),
-                            ]),
-                            SizedBox(height: 24),
-                            
-                            // Settings
-                            _buildInfoSection('Settings', [
-                              _buildSettingRow('Units', _viewModel.selectedUnit, 'Change'),
-                              _buildToggleRow('Notifications', 'Daily reminders enabled', _viewModel.notificationsEnabled),
-                              _buildToggleRow('Data Sync', 'Auto-sync with cloud', _viewModel.dataSyncEnabled),
-                            ]),
-                            SizedBox(height: 24),
-                            
-                            // Support
-                            _buildInfoSection('Support & Info', [
-                              _buildActionRow('Help Center'),
-                              _buildActionRow('Privacy Policy'),
-                              _buildActionRow('Terms of Service'),
-                              _buildActionRow('Sign Out', color: Colors.red),
-                            ]),
-                            SizedBox(height: 100),
+                      SizedBox(height: 24),
+                      
+                      // Personal Info
+                      _buildInfoSection('Personal Information', [
+                              _buildInfoRow('Gender', '${_viewModel.weight}', onEdit: () => _editWeight(context)),
+                              _buildInfoRow('Age', '${_viewModel.age} years', onEdit: () => _editAge(context)),
+                              _buildInfoRow('Height', '${_viewModel.height.toStringAsFixed(0)} cm', onEdit: () => _editHeight(context)),
+                              _buildInfoRow('Activity Level', _viewModel.activityLevel, onEdit: () => _editActivityLevel(context)),
+                      ]),
+                      
+                      SizedBox(height: 24),
+                      
+                      // Settings
+                      _buildInfoSection('Settings', [
+                        _buildSettingRow('Units', _viewModel.selectedUnit, 'Change'),
+                        _buildToggleRow('Notifications', 'Daily reminders enabled', _viewModel.notificationsEnabled),
+                        _buildToggleRow('Data Sync', 'Auto-sync with cloud', _viewModel.dataSyncEnabled),
+                      ]),
+                      SizedBox(height: 24),
+                      
+                      // Support
+                      _buildInfoSection('Support & Info', [
+                        _buildActionRow('Help Center'),
+                        _buildActionRow('Privacy Policy'),
+                        _buildActionRow('Terms of Service'),
+                        _buildActionRow('Sign Out', color: Colors.red),
+                      ]),
+                      SizedBox(height: 100),
                           ],
                         ),
                       ),
@@ -196,7 +203,419 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  void _editAge(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          final scrollController = FixedExtentScrollController(initialItem: _viewModel.age - 1);
+          int selectedAge = _viewModel.age;
+          
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.6,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              children: [
+                // Header
+                Padding(
+                  padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(Icons.close),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.grey[200],
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                      ),
+                      Text('Edit Age', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      SizedBox(width: 48),
+                    ],
+                  ),
+                ),
+                Divider(color: Colors.grey[200], height: 1),
+                SizedBox(height: 24),
+                Text('Select your age', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                SizedBox(height: 24),
+                // Scrollable picker
+                Expanded(
+                  child: ListWheelScrollView.useDelegate(
+                    itemExtent: 50,
+                    diameterRatio: 2,
+                    controller: scrollController,
+                    physics: FixedExtentScrollPhysics(),
+                    onSelectedItemChanged: (index) {
+                      setState(() {
+                        selectedAge = index + 1;
+                      });
+                      _viewModel.updateAge(selectedAge);
+                    },
+                    childDelegate: ListWheelChildBuilderDelegate(
+                      builder: (context, index) {
+                        final age = index + 1;
+                        final isSelected = age == selectedAge;
+                        return Container(
+                          alignment: Alignment.center,
+                          child: Text(
+                            '$age years',
+                            style: TextStyle(
+                              fontSize: isSelected ? 22 : 18,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              color: isSelected ? Color(0xFF667EEA) : Colors.grey[600],
+                            ),
+                          ),
+                        );
+                      },
+                      childCount: 150,
+                    ),
+                  ),
+                ),
+                // Save button
+                Padding(
+                  padding: EdgeInsets.all(24),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF667EEA),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                      ),
+                      child: Text('Save', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _editHeight(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          final currentHeight = _viewModel.height.round();
+          final initialIndex = (currentHeight - 50).clamp(0, 200);
+          final scrollController = FixedExtentScrollController(initialItem: initialIndex);
+          int selectedHeight = currentHeight;
+          
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.6,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              children: [
+                // Header
+                Padding(
+                  padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(Icons.close),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.grey[200],
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                      ),
+                      Text('Edit Height', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      SizedBox(width: 48),
+                    ],
+                  ),
+                ),
+                Divider(color: Colors.grey[200], height: 1),
+                SizedBox(height: 24),
+                Text('Select your height', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                SizedBox(height: 24),
+                // Scrollable picker
+                Expanded(
+                  child: ListWheelScrollView.useDelegate(
+                    itemExtent: 50,
+                    diameterRatio: 2,
+                    controller: scrollController,
+                    physics: FixedExtentScrollPhysics(),
+                    onSelectedItemChanged: (index) {
+                      setState(() {
+                        selectedHeight = 50 + index;
+                      });
+                      _viewModel.updateHeight(selectedHeight.toDouble());
+                    },
+                    childDelegate: ListWheelChildBuilderDelegate(
+                      builder: (context, index) {
+                        final height = 50 + index;
+                        final isSelected = height == selectedHeight;
+                        return Container(
+                          alignment: Alignment.center,
+                          child: Text(
+                            '$height cm',
+                            style: TextStyle(
+                              fontSize: isSelected ? 22 : 18,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              color: isSelected ? Color(0xFF667EEA) : Colors.grey[600],
+                            ),
+                          ),
+                        );
+                      },
+                      childCount: 201, // 50 to 250 in 1 cm steps
+                    ),
+                  ),
+                ),
+                // Save button
+                Padding(
+                  padding: EdgeInsets.all(24),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF667EEA),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                      ),
+                      child: Text('Save', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _editWeight(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        final controller = TextEditingController(text: _viewModel.weight.toString());
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.6,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.close),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.grey[200],
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                    ),
+                    Text('Edit Weight', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    SizedBox(width: 48),
+                  ],
+                ),
+              ),
+              Divider(color: Colors.grey[200], height: 1),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Enter your weight', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                      SizedBox(height: 24),
+                      TextField(
+                        controller: controller,
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                        decoration: InputDecoration(
+                          hintText: '0.0',
+                          suffixText: 'kg',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide(color: Color(0xFF667EEA), width: 2),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Save button
+              Padding(
+                padding: EdgeInsets.all(24),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final value = controller.text.trim();
+                      final weight = double.tryParse(value);
+                      if (weight != null && weight >= 20 && weight <= 300) {
+                        _viewModel.updateWeight(weight);
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Please enter a valid weight (20-300 kg)')),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF667EEA),
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                    ),
+                    child: Text('Save', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _editActivityLevel(BuildContext context) {
+    final activityLevels = ['Sedentary', 'Lightly Active', 'Moderately Active', 'Very Active', 'Extra Active'];
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.6,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(Icons.close),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.grey[200],
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                  ),
+                  Text('Edit Activity Level', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  SizedBox(width: 48),
+                ],
+              ),
+            ),
+            Divider(color: Colors.grey[200], height: 1),
+            SizedBox(height: 24),
+            Text('Select your activity level', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            SizedBox(height: 24),
+            // Activity level options
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                itemCount: activityLevels.length,
+                itemBuilder: (context, index) {
+                  final level = activityLevels[index];
+                  final isSelected = level == _viewModel.activityLevel;
+                  return InkWell(
+                    onTap: () {
+                      _viewModel.updateActivityLevel(level);
+                      Navigator.pop(context);
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 12),
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: isSelected ? Color(0xFF667EEA).withOpacity(0.1) : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(16),
+                        border: isSelected ? Border.all(color: Color(0xFF667EEA), width: 2) : null,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(level, style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            color: isSelected ? Color(0xFF667EEA) : Colors.black87,
+                          )),
+                          if (isSelected)
+                            Icon(Icons.check_circle, color: Color(0xFF667EEA)),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildInfoRow(String label, String value, {VoidCallback? onEdit}) {
+    if (onEdit != null) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            InkWell(
+              onTap: onEdit,
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Color(0xFF667EEA), width: 1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(value, style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey[600])),
+                    SizedBox(width: 6),
+                    Icon(Icons.arrow_drop_down, size: 20, color: Colors.grey[600]),
+                    ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -207,6 +626,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
     );
+    }
   }
 
   Widget _buildSettingRow(String title, String subtitle, String action) {
