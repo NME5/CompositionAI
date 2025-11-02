@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../views/connect_scale_page.dart';
+import '../views/scale_measurement_page.dart';
 
 class ConnectScaleDialog {
   static void show(BuildContext context, {required Function(String deviceName) onConnected}) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ConnectScalePage(
+        builder: (context) => ScaleMeasurementPage(
           onConnected: onConnected,
         ),
       ),
