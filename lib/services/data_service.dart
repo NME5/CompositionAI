@@ -25,7 +25,7 @@ class DataService {
       name: 'Alex Johnson',
       age: 28,
       height: 175,
-      weight: 72.5,
+      gender: 'Male',
       activityLevel: 'Moderately Active',
       membershipType: 'Premium Member',
       memberSince: DateTime(2023, 1, 1),

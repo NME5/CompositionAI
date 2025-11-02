@@ -10,10 +10,19 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> with TickerProvider
   late AnimationController _progressController;
   late Animation<double> _progressAnimation;
   int _currentStep = 0;
-
+  
+  // Body composition metrics (randomized values)
+  final Map<String, double> _bodyMetrics = {
+    'bodyFat': 20,      // Body fat percentage (red/orange)
+    'muscleMass': 20,   // Muscle mass percentage (green)
+    'water': 40,        // Water percentage (blue)
+    'boneMass': 20,      // Bone mass percentage (purple)
+  };
+  
   @override
   void initState() {
     super.initState();
+    
     _progressController = AnimationController(
       duration: Duration(seconds: 4),
       vsync: this,
@@ -74,11 +83,20 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> with TickerProvider
               ),
             ),
             
-            SizedBox(height: 32),
-            Text('Step on the Scale', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            SizedBox(height: 24),
+            Text(
+              'Your Body Composition',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
             SizedBox(height: 8),
-            Text('Stand still for accurate measurement', style: TextStyle(color: Colors.grey[600])),
+            Text(
+              'Analyzing your body metrics breakdown',
+              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
             
+            SizedBox(height: 32),
             // Progress Circle
             Expanded(
               child: Center(
@@ -94,11 +112,12 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> with TickerProvider
                           child: AnimatedBuilder(
                             animation: _progressAnimation,
                             builder: (context, child) {
-                              return CircularProgressIndicator(
-                                value: _progressAnimation.value,
-                                strokeWidth: 8,
-                                backgroundColor: Colors.grey[200],
-                                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF667EEA)),
+                              return CustomPaint(
+                                painter: MultiColorProgressPainter(
+                                  progress: _progressAnimation.value,
+                                  metrics: _bodyMetrics,
+                                ),
+                                child: Container(),
                               );
                             },
                           ),
@@ -114,32 +133,82 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> with TickerProvider
                                 );
                               },
                             ),
-                            Text('Analyzing...', style: TextStyle(color: Colors.grey[600])),
+                            AnimatedBuilder(
+                              animation: _progressAnimation,
+                              builder: (context, child) {
+                                return Text(
+                                  _progressAnimation.value < 1.0 
+                                    ? 'Analyzing...' 
+                                    : 'Complete',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                  ),
+                                );
+                              },
+                            ),
                           ],
                         ),
                       ],
                     ),
-                    SizedBox(height: 32),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 8, height: 8,
+                    SizedBox(height: 40),
+                    AnimatedBuilder(
+                      animation: _progressAnimation,
+                      builder: (context, child) {
+                        if (_progressAnimation.value < 1.0) {
+                          return Container(
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
-                              color: Colors.blue,
-                              shape: BoxShape.circle,
+                              color: Color(0xFF667EEA).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                          ),
-                          SizedBox(width: 8),
-                          Text('Measuring body composition', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w500)),
-                        ],
-                      ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 8, height: 8,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFF667EEA),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Analyzing composition',
+                                  style: TextStyle(
+                                    color: Color(0xFF667EEA),
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          return Container(
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.green[50],
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.check_circle, color: Colors.green, size: 16),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Analysis complete',
+                                  style: TextStyle(
+                                    color: Colors.green[700],
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -195,6 +264,126 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> with TickerProvider
         ),
       ],
     );
+  }
+}
+
+class MultiColorProgressPainter extends CustomPainter {
+  final double progress;
+  final Map<String, double> metrics;
+  
+  MultiColorProgressPainter({
+    required this.progress,
+    required this.metrics,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+    final strokeWidth = 8.0;
+    
+    // Background circle
+    final backgroundPaint = Paint()
+      ..color = Colors.grey[200]!
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+    canvas.drawCircle(center, radius - strokeWidth / 2, backgroundPaint);
+    
+    // Calculate arc segments for each metric
+    // Normalize values so they fit in the circle (they should add up to represent total)
+    double total = metrics['bodyFat']! + metrics['muscleMass']! + metrics['water']! + metrics['boneMass']!;
+    double normalizedBodyFat = (metrics['bodyFat']! / total) * 100;
+    double normalizedMuscle = (metrics['muscleMass']! / total) * 100;
+    double normalizedWater = (metrics['water']! / total) * 100;
+    double normalizedBone = (metrics['boneMass']! / total) * 100;
+    
+    // Start angle (top of circle)
+    double startAngle = -90 * (3.14159 / 180); // Start from top (-90 degrees in radians)
+    
+    // Paint for each segment
+    final bodyFatPaint = Paint()
+      ..color = Colors.yellowAccent // Yellow for body fat
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+    
+    final musclePaint = Paint()
+      ..color = Colors.redAccent // Red for muscle
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+    
+    final waterPaint = Paint()
+      ..color = Color(0xFF339AF0) // Blue for water
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+    
+    final bonePaint = Paint()
+      ..color = const Color.fromARGB(255, 253, 253, 200) // bone white for bone
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+    
+    // Draw each segment with animation
+    double sweepAngle = 2 * 3.14159; // Full circle in radians
+    double currentAngle = startAngle;
+    
+    // Body Fat segment
+    double bodyFatSweep = (normalizedBodyFat / 100) * sweepAngle * progress;
+    if (bodyFatSweep > 0) {
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
+        currentAngle,
+        bodyFatSweep,
+        false,
+        bodyFatPaint,
+      );
+      currentAngle += bodyFatSweep;
+    }
+    
+    // Muscle Mass segment
+    double muscleSweep = (normalizedMuscle / 100) * sweepAngle * progress;
+    if (muscleSweep > 0) {
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
+        currentAngle,
+        muscleSweep,
+        false,
+        musclePaint,
+      );
+      currentAngle += muscleSweep;
+    }
+    
+    // Water segment
+    double waterSweep = (normalizedWater / 100) * sweepAngle * progress;
+    if (waterSweep > 0) {
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
+        currentAngle,
+        waterSweep,
+        false,
+        waterPaint,
+      );
+      currentAngle += waterSweep;
+    }
+    
+    // Bone Mass segment
+    double boneSweep = (normalizedBone / 100) * sweepAngle * progress;
+    if (boneSweep > 0) {
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
+        currentAngle,
+        boneSweep,
+        false,
+        bonePaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(MultiColorProgressPainter oldDelegate) {
+    return oldDelegate.progress != progress || oldDelegate.metrics != metrics;
   }
 }
 

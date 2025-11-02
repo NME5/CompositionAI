@@ -1,25 +1,35 @@
 import 'package:flutter/material.dart';
+import '../models/user_profile.dart';
 
 class ProfileViewModel extends ChangeNotifier {
   bool _notificationsEnabled = true;
   bool _dataSyncEnabled = true;
   String _selectedUnit = 'Metric (kg, cm)';
   
-  // Personal Information
-  int _age = 28;
-  double _height = 175.0;
-  double _weight = 72.5;
-  String _gender = 'Male';
-  String _activityLevel = 'Moderately Active';
+  // Personal Information - now using UserProfile model
+  UserProfile _userProfile;
+
+  ProfileViewModel({UserProfile? userProfile}) 
+    : _userProfile = userProfile ?? UserProfile(
+        name: 'John Doe',
+        age: 28,
+        height: 175.0,
+        gender: 'Male',
+        activityLevel: 'Moderately Active',
+        membershipType: 'Premium',
+        memberSince: DateTime.now(),
+      );
 
   bool get notificationsEnabled => _notificationsEnabled;
   bool get dataSyncEnabled => _dataSyncEnabled;
   String get selectedUnit => _selectedUnit;
-  int get age => _age;
-  double get height => _height;
-  double get weight => _weight;
-  String get gender => _gender;
-  String get activityLevel => _activityLevel;
+  
+  // Personal Information getters
+  UserProfile get userProfile => _userProfile;
+  int get age => _userProfile.age;
+  double get height => _userProfile.height;
+  String get gender => _userProfile.gender;
+  String get activityLevel => _userProfile.activityLevel;
 
   void toggleNotifications(bool value) {
     _notificationsEnabled = value;
@@ -37,27 +47,28 @@ class ProfileViewModel extends ChangeNotifier {
   }
 
   void updateAge(int newAge) {
-    _age = newAge;
+    _userProfile.age = newAge;
     notifyListeners();
   }
 
   void updateHeight(double newHeight) {
-    _height = newHeight;
-    notifyListeners();
-  }
-
-  void updateWeight(double newWeight) {
-    _weight = newWeight;
+    _userProfile.height = newHeight;
     notifyListeners();
   }
 
   void updateGender(String newGender) {
-    _gender = newGender;
+    _userProfile.gender = newGender;
     notifyListeners();
   }
 
   void updateActivityLevel(String newActivityLevel) {
-    _activityLevel = newActivityLevel;
+    _userProfile.activityLevel = newActivityLevel;
+    notifyListeners();
+  }
+
+  // Method to update the entire user profile at once if needed
+  void updateUserProfile(UserProfile newProfile) {
+    _userProfile = newProfile;
     notifyListeners();
   }
 }

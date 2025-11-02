@@ -14,13 +14,9 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _viewModel = ProfileViewModel();
-    // Initialize view model with data from service
+    // Initialize view model with data from service using UserProfile model
     final profile = _dataService.getUserProfile();
-    _viewModel.updateAge(profile.age);
-    _viewModel.updateHeight(profile.height);
-    _viewModel.updateWeight(profile.weight);
-    _viewModel.updateActivityLevel(profile.activityLevel);
+    _viewModel = ProfileViewModel(userProfile: profile);
   }
 
   @override
