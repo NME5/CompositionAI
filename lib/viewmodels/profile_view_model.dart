@@ -9,6 +9,7 @@ class ProfileViewModel extends ChangeNotifier {
   int _age = 28;
   double _height = 175.0;
   double _weight = 72.5;
+  String _gender = 'Male';
   String _activityLevel = 'Moderately Active';
 
   bool get notificationsEnabled => _notificationsEnabled;
@@ -17,6 +18,7 @@ class ProfileViewModel extends ChangeNotifier {
   int get age => _age;
   double get height => _height;
   double get weight => _weight;
+  String get gender => _gender;
   String get activityLevel => _activityLevel;
 
   void toggleNotifications(bool value) {
@@ -46,6 +48,11 @@ class ProfileViewModel extends ChangeNotifier {
 
   void updateWeight(double newWeight) {
     _weight = newWeight;
+    notifyListeners();
+  }
+
+  void updateGender(String newGender) {
+    _gender = newGender;
     notifyListeners();
   }
 

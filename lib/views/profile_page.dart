@@ -72,8 +72,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       // User Info
                       Padding(
                         padding: const EdgeInsets.all(24),
-                        child: Column(
-                          children: [
+                  child: Column(
+                    children: [
                       Container(
                         padding: EdgeInsets.all(24),
                         decoration: BoxDecoration(
@@ -137,7 +137,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       
                       // Personal Info
                       _buildInfoSection('Personal Information', [
-                              _buildInfoRow('Gender', '${_viewModel.weight}', onEdit: () => _editWeight(context)),
+                              _buildInfoRow('Gender', _viewModel.gender, onEdit: () => _editGender(context)),
                               _buildInfoRow('Age', '${_viewModel.age} years', onEdit: () => _editAge(context)),
                               _buildInfoRow('Height', '${_viewModel.height.toStringAsFixed(0)} cm', onEdit: () => _editHeight(context)),
                               _buildInfoRow('Activity Level', _viewModel.activityLevel, onEdit: () => _editActivityLevel(context)),
@@ -235,46 +235,65 @@ class _ProfilePageState extends State<ProfilePage> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
                       ),
-                      Text('Edit Age', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      Text('Select Your Age', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                       SizedBox(width: 48),
                     ],
                   ),
                 ),
                 Divider(color: Colors.grey[200], height: 1),
                 SizedBox(height: 24),
-                Text('Select your age', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                SizedBox(height: 24),
-                // Scrollable picker
+                // Scrollable picker with fixed unit
                 Expanded(
-                  child: ListWheelScrollView.useDelegate(
-                    itemExtent: 50,
-                    diameterRatio: 2,
-                    controller: scrollController,
-                    physics: FixedExtentScrollPhysics(),
-                    onSelectedItemChanged: (index) {
-                      setState(() {
-                        selectedAge = index + 1;
-                      });
-                      _viewModel.updateAge(selectedAge);
-                    },
-                    childDelegate: ListWheelChildBuilderDelegate(
-                      builder: (context, index) {
-                        final age = index + 1;
-                        final isSelected = age == selectedAge;
-                        return Container(
-                          alignment: Alignment.center,
-                          child: Text(
-                            '$age years',
-                            style: TextStyle(
-                              fontSize: isSelected ? 22 : 18,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              color: isSelected ? Color(0xFF667EEA) : Colors.grey[600],
-                            ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Scrollable numbers
+                      SizedBox(
+                        width: 120,
+                        child: ListWheelScrollView.useDelegate(
+                          itemExtent: 50,
+                          diameterRatio: 1.5,
+                          controller: scrollController,
+                          physics: FixedExtentScrollPhysics(),
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              selectedAge = index + 1;
+                            });
+                            _viewModel.updateAge(selectedAge);
+                          },
+                          childDelegate: ListWheelChildBuilderDelegate(
+                            builder: (context, index) {
+                              final age = index + 1;
+                              final isSelected = age == selectedAge;
+                              return Container(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  '$age',
+                                  style: TextStyle(
+                                    fontSize: isSelected ? 22 : 18,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                    color: isSelected ? Color(0xFF667EEA) : Colors.grey[600],
+                                  ),
+                                ),
+                              );
+                            },
+                            childCount: 150,
                           ),
-                        );
-                      },
-                      childCount: 150,
-                    ),
+                        ),
+                      ),
+                      // Fixed unit text
+                      Padding(
+                        padding: EdgeInsets.only(left: 8),
+                        child: Text(
+                          'years',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF667EEA),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 // Save button
@@ -336,46 +355,65 @@ class _ProfilePageState extends State<ProfilePage> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
                       ),
-                      Text('Edit Height', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      Text('Select Your Height', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                       SizedBox(width: 48),
                     ],
                   ),
                 ),
                 Divider(color: Colors.grey[200], height: 1),
                 SizedBox(height: 24),
-                Text('Select your height', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                SizedBox(height: 24),
-                // Scrollable picker
+                // Scrollable picker with fixed unit
                 Expanded(
-                  child: ListWheelScrollView.useDelegate(
-                    itemExtent: 50,
-                    diameterRatio: 2,
-                    controller: scrollController,
-                    physics: FixedExtentScrollPhysics(),
-                    onSelectedItemChanged: (index) {
-                      setState(() {
-                        selectedHeight = 50 + index;
-                      });
-                      _viewModel.updateHeight(selectedHeight.toDouble());
-                    },
-                    childDelegate: ListWheelChildBuilderDelegate(
-                      builder: (context, index) {
-                        final height = 50 + index;
-                        final isSelected = height == selectedHeight;
-                        return Container(
-                          alignment: Alignment.center,
-                          child: Text(
-                            '$height cm',
-                            style: TextStyle(
-                              fontSize: isSelected ? 22 : 18,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              color: isSelected ? Color(0xFF667EEA) : Colors.grey[600],
-                            ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Scrollable numbers
+                      SizedBox(
+                        width: 120,
+                        child: ListWheelScrollView.useDelegate(
+                          itemExtent: 50,
+                          diameterRatio: 1.5,
+                          controller: scrollController,
+                          physics: FixedExtentScrollPhysics(),
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              selectedHeight = 50 + index;
+                            });
+                            _viewModel.updateHeight(selectedHeight.toDouble());
+                          },
+                          childDelegate: ListWheelChildBuilderDelegate(
+                            builder: (context, index) {
+                              final height = 50 + index;
+                              final isSelected = height == selectedHeight;
+                              return Container(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  '$height',
+                                  style: TextStyle(
+                                    fontSize: isSelected ? 22 : 18,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                    color: isSelected ? Color(0xFF667EEA) : Colors.grey[600],
+                                  ),
+                                ),
+                              );
+                            },
+                            childCount: 201, // 50 to 250 in 1 cm steps
                           ),
-                        );
-                      },
-                      childCount: 201, // 50 to 250 in 1 cm steps
-                    ),
+                        ),
+                      ),
+                      // Fixed unit text
+                      Padding(
+                        padding: EdgeInsets.only(left: 8),
+                        child: Text(
+                          'cm',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF667EEA),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 // Save button
@@ -403,102 +441,83 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _editWeight(BuildContext context) {
+  void _editGender(BuildContext context) {
+    final genders = ['Male', 'Female'];
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) {
-        final controller = TextEditingController(text: _viewModel.weight.toString());
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.6,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            children: [
-              // Header
-              Padding(
-                padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Icon(Icons.close),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.grey[200],
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      ),
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.5,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(Icons.close),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.grey[200],
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
-                    Text('Edit Weight', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    SizedBox(width: 48),
-                  ],
-                ),
-              ),
-              Divider(color: Colors.grey[200], height: 1),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Enter your weight', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                      SizedBox(height: 24),
-                      TextField(
-                        controller: controller,
-                        keyboardType: TextInputType.numberWithOptions(decimal: true),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                        decoration: InputDecoration(
-                          hintText: '0.0',
-                          suffixText: 'kg',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(color: Color(0xFF667EEA), width: 2),
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
-                ),
+                  Text('Select Your Gender', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  SizedBox(width: 48),
+                ],
               ),
-              // Save button
-              Padding(
-                padding: EdgeInsets.all(24),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      final value = controller.text.trim();
-                      final weight = double.tryParse(value);
-                      if (weight != null && weight >= 20 && weight <= 300) {
-                        _viewModel.updateWeight(weight);
-                        Navigator.pop(context);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Please enter a valid weight (20-300 kg)')),
-                        );
-                      }
+            ),
+            Divider(color: Colors.grey[200], height: 1),
+            SizedBox(height: 24),
+            // Gender options
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                itemCount: genders.length,
+                itemBuilder: (context, index) {
+                  final gender = genders[index];
+                  final isSelected = gender == _viewModel.gender;
+                  return InkWell(
+                    onTap: () {
+                      _viewModel.updateGender(gender);
+                      Navigator.pop(context);
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF667EEA),
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 12),
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: isSelected ? Color(0xFF667EEA).withOpacity(0.1) : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(16),
+                        border: isSelected ? Border.all(color: Color(0xFF667EEA), width: 2) : null,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(gender, style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            color: isSelected ? Color(0xFF667EEA) : Colors.black87,
+                          )),
+                          if (isSelected)
+                            Icon(Icons.check_circle, color: Color(0xFF667EEA)),
+                        ],
+                      ),
                     ),
-                    child: Text('Save', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  ),
-                ),
+                  );
+                },
               ),
-            ],
-          ),
-        );
-      },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -530,14 +549,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
                   ),
-                  Text('Edit Activity Level', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text('Select Your Activity Level', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   SizedBox(width: 48),
                 ],
               ),
             ),
             Divider(color: Colors.grey[200], height: 1),
-            SizedBox(height: 24),
-            Text('Select your activity level', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
             SizedBox(height: 24),
             // Activity level options
             Expanded(
@@ -587,42 +604,64 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildInfoRow(String label, String value, {VoidCallback? onEdit}) {
     if (onEdit != null) {
-      return Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(label, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-            InkWell(
-              onTap: onEdit,
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Color(0xFF667EEA), width: 1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(value, style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey[600])),
-                    SizedBox(width: 6),
-                    Icon(Icons.arrow_drop_down, size: 20, color: Colors.grey[600]),
-                    ],
-                ),
+      return InkWell(
+        onTap: onEdit,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(label, style: TextStyle(
+                color: Colors.black,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              )),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: Colors.grey[400],
+                  ),
+                ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     } else {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey[600])),
-          Text(value, style: TextStyle(fontWeight: FontWeight.w500)),
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.grey[700],
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+                color: Colors.black87,
+              ),
+            ),
         ],
       ),
     );
