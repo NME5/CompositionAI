@@ -160,10 +160,20 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
     if (mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => BodyAnalysisPage(
+        PageRouteBuilder(
+          transitionDuration: Duration(milliseconds: 800),
+          reverseTransitionDuration: Duration(milliseconds: 250),
+          pageBuilder: (context, animation, secondaryAnimation) => BodyAnalysisPage(
             compositionResult: composition,
           ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+            final offsetTween = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero);
+            return SlideTransition(
+              position: offsetTween.animate(curved),
+              child: child,
+            );
+          },
         ),
       );
     }
