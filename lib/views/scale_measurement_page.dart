@@ -18,7 +18,6 @@ class ScaleMeasurementPage extends StatefulWidget {
 class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with TickerProviderStateMixin {
   late AnimationController _scanController;
   late AnimationController _progressController;
-  late Animation<double> _progressAnimation;
   
   final BluetoothScaleService _bluetoothService = BluetoothScaleService();
   final DataService _dataService = DataService();
@@ -26,17 +25,16 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
   StreamSubscription<ScaleReading>? _readingSubscription;
   StreamSubscription<String>? _deviceSubscription;
   
-  double _progress = 0.0;
   bool _isMeasuring = false;
   int _currentStep = 0;
   String _deviceName = '';
   ScaleReading? _latestReading;
-  Timer? _progressTimer;
   bool _hasValidReading = false;
 
   @override
   void initState() {
     super.initState();
+    print('[UI] ScaleMeasurementPage.initState');
     _scanController = AnimationController(
       duration: Duration(seconds: 2),
       vsync: this,
@@ -47,15 +45,8 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
       vsync: this,
     );
     
-    _progressAnimation = Tween<double>(begin: 0.0, end: 100.0).animate(
-      CurvedAnimation(parent: _progressController, curve: Curves.easeInOut),
-    )..addListener(() {
-      setState(() {
-        _progress = _progressAnimation.value;
-      });
-    });
-    
     // Start Bluetooth scanning
+    print('[UI] Starting Bluetooth scanning...');
     _startBluetoothScanning();
   }
   
@@ -69,6 +60,7 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
           setState(() {
             _deviceName = deviceName;
           });
+          print('[UI] Device detected: $_deviceName');
         }
       });
       
@@ -78,9 +70,13 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
           setState(() {
             _latestReading = reading;
           });
+          print('[UI] Reading update: weightKg=${reading.weightKg?.toStringAsFixed(1) ?? 'null'}, '
+                'impedance=${reading.impedanceOhm.toStringAsFixed(1)} Ω, '
+                'hasWeight=${reading.hasValidWeight}, hasImp=${reading.hasValidImpedance}, isMeasuring=$_isMeasuring');
           
           // Start measuring when we get a valid reading
           if (!_isMeasuring && reading.hasValidWeight) {
+            print('[UI] Valid weight detected, starting measuring');
             _startMeasuring();
           }
           
@@ -90,19 +86,22 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
             // Estimate progress: impedance goes from ~0 (measuring) to ~600 (stable)
             final impedanceProgress = (reading.impedanceOhm / 600.0).clamp(0.0, 1.0);
             _progressController.value = impedanceProgress;
+            print('[UI] Impedance progress: ${(impedanceProgress * 100).toStringAsFixed(0)}% (ohm=${reading.impedanceOhm.toStringAsFixed(1)})');
             
-            // Update steps
+            // Update steps and readiness without a separate step 3
             if (impedanceProgress >= 0.33 && _currentStep < 2) {
               setState(() => _currentStep = 2);
-            } else if (impedanceProgress >= 0.66 && _currentStep < 3) {
+              print('[UI] Step advanced: 2 (Weight detected)');
+            }
+            if (impedanceProgress >= 0.66 && !_hasValidReading) {
               setState(() {
-                _currentStep = 3;
                 _hasValidReading = true;
               });
-              
+              print('[UI] Measurement ready (impedance stable), proceeding to results');
               // When measurement is complete, navigate to results
               Future.delayed(Duration(seconds: 1), () {
                 if (mounted && _hasValidReading && _latestReading != null) {
+                  print('[UI] Navigating to results page');
                   _navigateToResults();
                 }
               });
@@ -111,7 +110,7 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
         }
       });
     } catch (e) {
-      print('Bluetooth scanning error: $e');
+      print('[UI] Bluetooth scanning error: $e');
       // Show error dialog
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -127,6 +126,7 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
         _isMeasuring = true;
         _currentStep = 1; // Step 0 (Scale detected) is completed, step 1 (Weight measured) becomes active
       });
+      print('[UI] Measuring started: step=1');
       _progressController.value = 0.0;
     }
   }
@@ -139,6 +139,7 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
     final composition = _bluetoothService.calculateComposition(_latestReading!, userProfile);
     
     if (composition == null) {
+      print('[UI] Composition calculation returned null');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Unable to calculate body composition. Please try again.')),
       );
@@ -146,10 +147,12 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
     }
     
     // Stop scanning
+    print('[UI] Stopping scanning before navigation');
     _bluetoothService.stopScanning();
     
     // Call onConnected callback if provided
     if (widget.onConnected != null && _deviceName.isNotEmpty) {
+      print('[UI] onConnected callback with device: $_deviceName');
       widget.onConnected!(_deviceName);
     }
     
@@ -173,7 +176,6 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
     _bluetoothService.stopScanning();
     _scanController.dispose();
     _progressController.dispose();
-    _progressTimer?.cancel();
     super.dispose();
   }
 
@@ -290,7 +292,7 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        '${_progress.toStringAsFixed(1)}',
+                                        '${(_latestReading?.weightKg ?? 0).toStringAsFixed(1)}',
                                         style: TextStyle(
                                           fontSize: 32,
                                           fontWeight: FontWeight.bold,
@@ -298,7 +300,7 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
                                         ),
                                       ),
                                       Text(
-                                        '%',
+                                        'kg',
                                         style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w600,
@@ -339,7 +341,7 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
               ),
             ),
             
-             // Measurement Steps
+             // Measurement Steps (removed step 3: Analyzing impedance)
              Padding(
                padding: EdgeInsets.all(24),
                child: Column(
@@ -347,8 +349,6 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
                    _buildMeasurementStep(0, 'Scale detected', _currentStep >= 1),
                    SizedBox(height: 16),
                    _buildMeasurementStep(1, 'Weight detected', _currentStep >= 2),
-                   SizedBox(height: 16),
-                   _buildMeasurementStep(2, 'Analyzing impedance', _currentStep >= 3),
                  ],
                ),
              ),

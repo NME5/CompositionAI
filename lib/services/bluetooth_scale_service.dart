@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../models/scale_reading.dart';
 import '../models/user_profile.dart';
-import 'composition_calculator.dart';
+import 'body_composition_calculator.dart';
 
 /// Bluetooth Scale Service
 /// Handles BLE scanning, device connection, and data parsing from scale manufacturer data
@@ -15,6 +15,9 @@ class BluetoothScaleService {
   StreamSubscription<List<ScanResult>>? _scanSubscription;
   StreamController<ScaleReading>? _readingController;
   StreamController<String>? _deviceController;
+  Timer? _scanRestartTimer;
+  bool _keepAlive = false;
+  bool _hasNonZeroImpedance = false;
   
   /// Target MAC address (empty string to accept any scale)
   String targetMac = "";
@@ -30,51 +33,72 @@ class BluetoothScaleService {
   /// Start scanning for BLE scales
   Future<void> startScanning({String? targetMacAddress}) async {
     if (isScanning) {
+      print('[BLE] startScanning: already scanning, stopping previous scan first');
       await stopScanning();
     }
 
     if (targetMacAddress != null && targetMacAddress.isNotEmpty) {
       targetMac = targetMacAddress.toUpperCase();
+      print('[BLE] startScanning: targetMac filter = $targetMac');
     }
 
     _readingController = StreamController<ScaleReading>.broadcast();
     _deviceController = StreamController<String>.broadcast();
+    _keepAlive = true;
+    _hasNonZeroImpedance = false;
 
     // Check if Bluetooth is available
     if (await FlutterBluePlus.isSupported == false) {
+      print('[BLE] startScanning: Bluetooth not supported');
       throw Exception('Bluetooth not supported on this device');
     }
 
     // Request permissions and turn on Bluetooth
+    print('[BLE] startScanning: turning on Bluetooth...');
     await FlutterBluePlus.turnOn();
 
     _scanSubscription = FlutterBluePlus.scanResults.listen(
       (List<ScanResult> results) {
+        print('[BLE] scanResults: batch size = ${results.length}');
         for (ScanResult result in results) {
           _processScanResult(result);
         }
       },
       onError: (error) {
-        print('BLE Scan error: $error');
+        print('[BLE] scanResults error: $error');
       },
     );
 
     // Start scanning with filters
+    print('[BLE] startScanning: starting scan (10s timeout)');
     await FlutterBluePlus.startScan(
       timeout: const Duration(seconds: 10),
       androidUsesFineLocation: true,
     );
+
+    // Ensure scanning keeps running while impedance stays 0 and dialog/page is open
+    _scheduleScanRestart();
   }
 
   /// Stop scanning
   Future<void> stopScanning() async {
+    print('[BLE] stopScanning: requested');
+    _keepAlive = false;
+    _hasNonZeroImpedance = false;
+    _scanRestartTimer?.cancel();
+    _scanRestartTimer = null;
     await _scanSubscription?.cancel();
     _scanSubscription = null;
-    await FlutterBluePlus.stopScan();
+    try {
+      await FlutterBluePlus.stopScan();
+    } catch (e) {
+      print('[BLE] stopScan error: $e');
+    }
     await _readingController?.close();
     await _deviceController?.close();
     _readingController = null;
     _deviceController = null;
+    print('[BLE] stopScanning: completed');
   }
 
   /// Process a scan result and extract scale data
@@ -114,11 +138,50 @@ class BluetoothScaleService {
 
           // Emit reading
           _readingController?.add(reading);
+
+          // Mark when we first see a non-zero impedance to stop forced restarts
+          if (reading.hasValidImpedance && reading.impedanceOhm > 0) {
+            _hasNonZeroImpedance = true;
+            print('[BLE] first non-zero impedance detected: ${reading.impedanceOhm.toStringAsFixed(1)} Ω');
+          }
+
+          print('[BLE] reading from $address (mfg=$companyId rssi=${result.rssi}): '
+                'weightKg=${reading.weightKg?.toStringAsFixed(1) ?? 'null'}, '
+                'impedance=${reading.impedanceOhm.toStringAsFixed(1)} Ω, '
+                'unit=0x${reading.unitStatus.toRadixString(16)}');
         }
       }
     } catch (e) {
-      print('Error processing scan result: $e');
+      print('[BLE] Error processing scan result: $e');
     }
+  }
+
+  /// Schedule periodic restart of scanning while impedance remains zero
+  void _scheduleScanRestart() {
+    _scanRestartTimer?.cancel();
+    _scanRestartTimer = Timer.periodic(const Duration(seconds: 12), (timer) async {
+      if (!_keepAlive) {
+        print('[BLE] restart timer: keepAlive=false, cancel');
+        timer.cancel();
+        return;
+      }
+      if (_hasNonZeroImpedance) {
+        // We have started receiving meaningful measurements; no need to force restarts
+        // print('[BLE] restart timer: non-zero impedance observed, no restart');
+        return;
+      }
+      try {
+        // Restart scan to keep results flowing if platform auto-stopped after timeout
+        print('[BLE] restart timer: restarting scan because impedance is still 0');
+        await FlutterBluePlus.stopScan();
+        await FlutterBluePlus.startScan(
+          timeout: const Duration(seconds: 10),
+          androidUsesFineLocation: true,
+        );
+      } catch (e) {
+        print('[BLE] Error restarting scan: $e');
+      }
+    });
   }
 
   /// Parse 13-byte payload from scale manufacturer data
@@ -147,7 +210,7 @@ class BluetoothScaleService {
       final rawHex = payload.map((b) => b.toRadixString(16).padLeft(2, '0').toUpperCase())
                             .join('');
 
-      return ScaleReading(
+      final reading = ScaleReading(
         weightKg: weightKg,
         impedanceOhm: impedanceOhm,
         unitStatus: unitStatus,
@@ -155,8 +218,13 @@ class BluetoothScaleService {
         mfgId: mfgId,
         rssi: rssi,
       );
+      print('[BLE] parse payload: mfg=$mfgId rssi=$rssi raw=$rawHex -> '
+            'weightKg=${weightKg?.toStringAsFixed(2) ?? 'null'}, '
+            'impedance=${impedanceOhm.toStringAsFixed(1)} Ω, '
+            'unit=0x${unitStatus.toRadixString(16)}');
+      return reading;
     } catch (e) {
-      print('Error parsing payload: $e');
+      print('[BLE] Error parsing payload: $e');
       return null;
     }
   }
@@ -197,6 +265,9 @@ class BluetoothScaleService {
     UserProfile userProfile,
   ) {
     if (!reading.hasValidWeight || !reading.hasValidImpedance) {
+      print('[BLE] calculateComposition: invalid reading: '
+            'hasWeight=${reading.hasValidWeight}, hasImpedance=${reading.hasValidImpedance}, '
+            'weightKg=${reading.weightKg}, impedance=${reading.impedanceOhm}');
       return null;
     }
 

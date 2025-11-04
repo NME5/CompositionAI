@@ -154,7 +154,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         _buildActionRow('Help Center'),
                         _buildActionRow('Privacy Policy'),
                         _buildActionRow('Terms of Service'),
-                        _buildActionRow('Credit'),
                         _buildActionRow('Sign Out', color: Colors.red),
                       ]),
                       SizedBox(height: 100),

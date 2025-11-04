@@ -50,7 +50,7 @@ class _MainScreenState extends State<MainScreen> {
                 ProfilePage(),
               ],
             ),
-            _buildFloatingActionButton(),
+            // _buildFloatingActionButton(), //haruse gabutuh to
           ],
         ),
       ),
