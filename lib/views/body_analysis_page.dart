@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../services/body_composition_calculator.dart';
 
@@ -17,7 +18,7 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> {
   @override
   void initState() {
     super.initState();
-    // Fallback sample if no result provided (for safety)
+    // Fallback sample if no result provided (for safety) MUST BE REMOVED LATER
     _result = widget.compositionResult ?? BodyCompositionResult(
       weightKg: 70.0,
       impedanceOhm: 500,
@@ -134,18 +135,18 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> {
                         filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
                         child: Container(
                           padding: EdgeInsets.all(16),
-                          decoration: BoxDecoration(
+                            decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.95),
-                            borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: Offset(0, 6)),
                             ],
-                          ),
+                            ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                               Text('Composition breakdown', style: TextStyle(fontWeight: FontWeight.w700)),
-                              SizedBox(height: 16),
+                              SizedBox(height: 25),
                               Center(
                                 child: SizedBox(
                                   width: 220,
@@ -183,19 +184,29 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> {
                       ),
                     ),
 
-                    // Metric grid (subtle like insights, with emojis)
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        _MetricCard(emoji: '🧈', title: 'Body Fat', value: '${_result.bfrPercent.toStringAsFixed(1)}%', subtitle: '${_result.fatMassKg.toStringAsFixed(1)} kg', color: Color(0xFFFFC857)),
-                        _MetricCard(emoji: '💧', title: 'Water', value: '${_result.tfrPercent.toStringAsFixed(1)}%', subtitle: 'Hydration', color: Color(0xFF78C0E0)),
-                        _MetricCard(emoji: '⚠️', title: 'Visceral Fat', value: _result.vfr.toStringAsFixed(0), subtitle: 'Rating', color: Color(0xFFE76F51)),
-                        _MetricCard(emoji: '💪', title: 'Muscle Mass', value: '${_result.slmKg.toStringAsFixed(1)} kg', subtitle: '${_result.slmPercent.toStringAsFixed(1)}%', color: Color(0xFF2A9D8F)),
-                        _MetricCard(emoji: '🦴', title: 'Bone Mass', value: '${_result.boneMassKg.toStringAsFixed(1)} kg', subtitle: 'Skeletal', color: Color(0xFF9E7AE8)),
-                        _MetricCard(emoji: '🎂', title: 'Body Age', value: '${_result.bodyAge}', subtitle: 'years', color: Color(0xFF8D99AE)),
-                        _MetricCard(emoji: '⚡', title: 'Impedance', value: '${_result.impedanceOhm.toStringAsFixed(0)} Ω', subtitle: 'Ohms', color: Color(0xFFB8E4C9)),
-                      ],
+                    // Metric grid container (subtle like insights, with emojis)
+                    Container(
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: Offset(0, 6)),
+                        ],
+                      ),
+                      child: Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          _MetricCard(emoji: '🧈', title: 'Body Fat', value: '${_result.bfrPercent.toStringAsFixed(1)}%', subtitle: '${_result.fatMassKg.toStringAsFixed(1)} kg', color: Color(0xFFFFC857)),
+                          _MetricCard(emoji: '💧', title: 'Water', value: '${_result.tfrPercent.toStringAsFixed(1)}%', subtitle: 'Hydration', color: Color(0xFF78C0E0)),
+                          _MetricCard(emoji: '⚠️', title: 'Visceral Fat', value: _result.vfr.toStringAsFixed(0), subtitle: 'Rating', color: Color(0xFFE76F51)),
+                          _MetricCard(emoji: '💪', title: 'Muscle Mass', value: '${_result.slmKg.toStringAsFixed(1)} kg', subtitle: '${_result.slmPercent.toStringAsFixed(1)}%', color: Color(0xFF2A9D8F)),
+                          _MetricCard(emoji: '🦴', title: 'Bone Mass', value: '${_result.boneMassKg.toStringAsFixed(1)} kg', subtitle: 'Skeletal', color: Color(0xFF9E7AE8)),
+                          _MetricCard(emoji: '🎂', title: 'Body Age', value: '${_result.bodyAge}', subtitle: 'years', color: Color(0xFF8D99AE)),
+                          _MetricCard(emoji: '⚡', title: 'Impedance', value: '${_result.impedanceOhm.toStringAsFixed(0)} Ω', subtitle: 'Ohms', color: Color(0xFFB8E4C9)),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -228,12 +239,12 @@ class _MetricCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: (MediaQuery.of(context).size.width - 24 - 24 - 12) / 2,
+      width: (MediaQuery.of(context).size.width - 24 - 24 - 16 - 16 - 12) / 2,
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: Offset(0, 6))],
+        // boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: Offset(0, 6))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,11 +367,46 @@ class SegmentedRadialPainter extends CustomPainter {
 
     double startAngle = -90 * (3.1415926535 / 180.0);
     final rect = Rect.fromCircle(center: center, radius: radius - strokeWidth / 2);
+    
+    final labelNames = ['Fat', 'Muscle', 'Water', 'Bone'];
+    final labelPercents = [
+      bodyFatPercent,
+      musclePercent,
+      waterPercent,
+      bonePercent,
+    ];
+    final textStyle = TextStyle(
+      color: Colors.grey[800],
+      fontSize: 11,
+      fontWeight: FontWeight.w600,
+    );
 
     for (int i = 0; i < vals.length; i++) {
       final sweep = vals[i] * 2 * 3.1415926535;
       if (sweep <= 0) continue;
       canvas.drawArc(rect, startAngle, sweep, false, paints[i]);
+      
+      // Draw label at midpoint of segment
+      if (sweep > 0.1) { // Only draw label if segment is large enough
+        final midAngle = startAngle + sweep / 2;
+        final labelRadius = radius - strokeWidth / 2 + 25; // Position label outside the ring
+        final labelX = center.dx + labelRadius * math.cos(midAngle);
+        final labelY = center.dy + labelRadius * math.sin(midAngle);
+        
+        final labelText = '${labelNames[i]}\n${labelPercents[i].toStringAsFixed(1)}%';
+        final textSpan = TextSpan(text: labelText, style: textStyle);
+        final textPainter = TextPainter(
+          text: textSpan,
+          textAlign: TextAlign.center,
+          textDirection: TextDirection.ltr,
+        );
+        textPainter.layout();
+        textPainter.paint(
+          canvas,
+          Offset(labelX - textPainter.width / 2, labelY - textPainter.height / 2),
+        );
+      }
+      
       startAngle += sweep;
     }
   }
