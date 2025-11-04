@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../services/bluetooth_scale_service.dart';
+import '../services/data_service.dart';
+import '../models/scale_reading.dart';
 import 'body_analysis_page.dart';
 
 class ScaleMeasurementPage extends StatefulWidget {
   final Function(String deviceName)? onConnected;
+  final String? targetMacAddress; // Optional: filter by specific MAC address
   
-  const ScaleMeasurementPage({this.onConnected});
+  const ScaleMeasurementPage({this.onConnected, this.targetMacAddress});
 
   @override
   State<ScaleMeasurementPage> createState() => _ScaleMeasurementPageState();
@@ -16,10 +20,19 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
   late AnimationController _progressController;
   late Animation<double> _progressAnimation;
   
+  final BluetoothScaleService _bluetoothService = BluetoothScaleService();
+  final DataService _dataService = DataService();
+  
+  StreamSubscription<ScaleReading>? _readingSubscription;
+  StreamSubscription<String>? _deviceSubscription;
+  
   double _progress = 0.0;
   bool _isMeasuring = false;
   int _currentStep = 0;
+  String _deviceName = '';
+  ScaleReading? _latestReading;
   Timer? _progressTimer;
+  bool _hasValidReading = false;
 
   @override
   void initState() {
@@ -42,53 +55,122 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
       });
     });
     
-    // Start measuring after a delay (when device is found)
-    _startMeasuring();
+    // Start Bluetooth scanning
+    _startBluetoothScanning();
+  }
+  
+  Future<void> _startBluetoothScanning() async {
+    try {
+      await _bluetoothService.startScanning(targetMacAddress: widget.targetMacAddress);
+      
+      // Listen for device names
+      _deviceSubscription = _bluetoothService.deviceStream?.listen((deviceName) {
+        if (mounted && _deviceName.isEmpty) {
+          setState(() {
+            _deviceName = deviceName;
+          });
+        }
+      });
+      
+      // Listen for scale readings
+      _readingSubscription = _bluetoothService.readingStream?.listen((reading) {
+        if (mounted) {
+          setState(() {
+            _latestReading = reading;
+          });
+          
+          // Start measuring when we get a valid reading
+          if (!_isMeasuring && reading.hasValidWeight) {
+            _startMeasuring();
+          }
+          
+          // Update progress based on impedance reading
+          // When impedance > 0 and stable (~600), we're measuring
+          if (_isMeasuring && reading.hasValidImpedance && reading.impedanceOhm > 50) {
+            // Estimate progress: impedance goes from ~0 (measuring) to ~600 (stable)
+            final impedanceProgress = (reading.impedanceOhm / 600.0).clamp(0.0, 1.0);
+            _progressController.value = impedanceProgress;
+            
+            // Update steps
+            if (impedanceProgress >= 0.33 && _currentStep < 2) {
+              setState(() => _currentStep = 2);
+            } else if (impedanceProgress >= 0.66 && _currentStep < 3) {
+              setState(() {
+                _currentStep = 3;
+                _hasValidReading = true;
+              });
+              
+              // When measurement is complete, navigate to results
+              Future.delayed(Duration(seconds: 1), () {
+                if (mounted && _hasValidReading && _latestReading != null) {
+                  _navigateToResults();
+                }
+              });
+            }
+          }
+        }
+      });
+    } catch (e) {
+      print('Bluetooth scanning error: $e');
+      // Show error dialog
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Bluetooth error: $e')),
+        );
+      }
+    }
   }
 
   void _startMeasuring() {
-    Future.delayed(Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _isMeasuring = true;
-          _currentStep = 1; // Step 0 (Weight detected) is completed, step 1 (Analyzing impedance) becomes active
-        });
-        _progressController.forward();
-        
-        // Update steps based on progress
-        _progressController.addListener(() {
-          final progress = _progressController.value;
-          if (mounted) {
-            if (progress >= 0.33 && _currentStep < 2) {
-              setState(() => _currentStep = 2); // Step 1 completed, step 2 (Calculating composition) becomes active
-            } else if (progress >= 0.66 && _currentStep < 3) {
-              setState(() => _currentStep = 3); // Step 2 completed
-            }
-          }
-        });
-        
-        // Navigate to BodyAnalysisPage when progress reaches 100% and all steps are completed
-        _progressController.addStatusListener((status) {
-          if (status == AnimationStatus.completed && _currentStep >= 3) {
-            Future.delayed(Duration(seconds: 1), () {
-              if (mounted) {
-                if (widget.onConnected != null) {
-                  widget.onConnected!('BodySync Pro X1'); // Mock device name
-                }
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => BodyAnalysisPage()),
-                );
-              }
-            });
-          }
-        });
-      }
-    });
+    if (mounted) {
+      setState(() {
+        _isMeasuring = true;
+        _currentStep = 1; // Step 0 (Scale detected) is completed, step 1 (Weight measured) becomes active
+      });
+      _progressController.value = 0.0;
+    }
+  }
+  
+  void _navigateToResults() {
+    if (_latestReading == null || !_hasValidReading) return;
+    
+    // Calculate body composition
+    final userProfile = _dataService.getUserProfile();
+    final composition = _bluetoothService.calculateComposition(_latestReading!, userProfile);
+    
+    if (composition == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unable to calculate body composition. Please try again.')),
+      );
+      return;
+    }
+    
+    // Stop scanning
+    _bluetoothService.stopScanning();
+    
+    // Call onConnected callback if provided
+    if (widget.onConnected != null && _deviceName.isNotEmpty) {
+      widget.onConnected!(_deviceName);
+    }
+    
+    // Navigate to results page with calculated data
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BodyAnalysisPage(
+            compositionResult: composition,
+          ),
+        ),
+      );
+    }
   }
 
   @override
   void dispose() {
+    _readingSubscription?.cancel();
+    _deviceSubscription?.cancel();
+    _bluetoothService.stopScanning();
     _scanController.dispose();
     _progressController.dispose();
     _progressTimer?.cancel();
@@ -264,9 +346,9 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
                  children: [
                    _buildMeasurementStep(0, 'Scale detected', _currentStep >= 1),
                    SizedBox(height: 16),
-                   _buildMeasurementStep(1, 'Weight measured', _currentStep >= 2),
+                   _buildMeasurementStep(1, 'Weight detected', _currentStep >= 2),
                    SizedBox(height: 16),
-                   _buildMeasurementStep(2, 'Calculating composition', _currentStep >= 3),
+                   _buildMeasurementStep(2, 'Analyzing impedance', _currentStep >= 3),
                  ],
                ),
              ),

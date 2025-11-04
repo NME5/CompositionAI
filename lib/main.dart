@@ -86,7 +86,7 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildFloatingActionButton() {
     return Positioned(
-      bottom: 100,
+      bottom: 20,
       right: 20,
       child: FloatingActionButton(
         onPressed: () => _showMeasurementDialog(),

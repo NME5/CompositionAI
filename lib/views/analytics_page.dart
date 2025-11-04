@@ -36,22 +36,31 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   child: Column(
                     children: [
                       // Header
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.fromLTRB(24, 12, 24, 24),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(24),
-                            bottomRight: Radius.circular(24),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Analytics', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-                            SizedBox(height: 8),
-                            Text('Detailed body composition insights', style: TextStyle(color: Colors.white70)),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Analytics', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                                SizedBox(height: 4),
+                                Text('Detailed body composition insights', style: TextStyle(color: Colors.grey[600])),
+                              ],
+                            ),
+                            
+                            Container(
+                              width: 48, height: 48,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(colors: [Color.fromARGB(255, 145, 165, 255), Color.fromARGB(255, 108, 51, 164)]),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Center(child: Text('📈', style: TextStyle(fontSize: 18))),
+                              ),
+                            ),
                           ],
                         ),
                       ),

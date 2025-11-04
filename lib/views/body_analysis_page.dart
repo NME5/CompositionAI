@@ -1,7 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../services/composition_calculator.dart';
 
 class BodyAnalysisPage extends StatefulWidget {
+  final BodyCompositionResult? compositionResult;
+  
+  const BodyAnalysisPage({this.compositionResult});
+
   @override
   State<BodyAnalysisPage> createState() => _BodyAnalysisPageState();
 }
@@ -11,17 +16,31 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> with TickerProvider
   late Animation<double> _progressAnimation;
   int _currentStep = 0;
   
-  // Body composition metrics (randomized values)
-  final Map<String, double> _bodyMetrics = {
-    'bodyFat': 20,      // Body fat percentage (red/orange)
-    'muscleMass': 20,   // Muscle mass percentage (green)
-    'water': 40,        // Water percentage (blue)
-    'boneMass': 20,      // Bone mass percentage (purple)
-  };
+  // Body composition metrics from calculated result or default values
+  late Map<String, double> _bodyMetrics;
   
   @override
   void initState() {
     super.initState();
+    
+    // Use calculated result or default values
+    if (widget.compositionResult != null) {
+      final result = widget.compositionResult!;
+      _bodyMetrics = {
+        'bodyFat': result.bfrPercent,
+        'muscleMass': result.slmPercent,
+        'water': result.tfrPercent,
+        'boneMass': result.boneMassKg,
+      };
+    } else {
+      // Default values if no result provided
+      _bodyMetrics = {
+        'bodyFat': 20,
+        'muscleMass': 20,
+        'water': 40,
+        'boneMass': 20,
+      };
+    }
     
     _progressController = AnimationController(
       duration: Duration(seconds: 4),
@@ -220,9 +239,9 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> with TickerProvider
               padding: EdgeInsets.all(24),
               child: Column(
                 children: [
-                  _buildMeasurementStep(0, 'Weight detected', _currentStep >= 0),
+                  Text('Weight: ${_bodyMetrics['weight']} kg'),
                   SizedBox(height: 16),
-                  _buildMeasurementStep(1, 'Analyzing impedance', _currentStep >= 1),
+                  Text('Weight: ${_bodyMetrics['unit']} kg'),
                   SizedBox(height: 16),
                   _buildMeasurementStep(2, 'Calculating composition', _currentStep >= 2),
                 ],
