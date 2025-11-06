@@ -65,151 +65,7 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> {
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(height: 8),
-                    Text(
-                      'Your Body Composition',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.left,
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Overview of your latest measurement',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                    ),
-                    SizedBox(height: 16),
-
-                    // Hero card
-                    Container(
-                      padding: EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                            width: 84,
-                            height: 84,
-                                  decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.15),
-                                    shape: BoxShape.circle,
-                                  ),
-                            child: Center(
-                              child: Text(
-                                _result.weightKg.toStringAsFixed(1),
-                                style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Weight', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                                Text('${_result.weightKg.toStringAsFixed(1)} kg', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                                SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    _Chip(text: 'BMI ${_result.bmi.toStringAsFixed(1)}'),
-                                SizedBox(width: 8),
-                                    _Chip(text: 'BMR ${_result.bmr.toStringAsFixed(0)} kcal'),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    SizedBox(height: 20),
-
-                    // Radial composition gauge (subtle, like insights)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                        child: Container(
-                          padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.95),
-                              borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: Offset(0, 6)),
-                            ],
-                            ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                              Text('Composition breakdown', style: TextStyle(fontWeight: FontWeight.w700)),
-                              SizedBox(height: 25),
-                              Center(
-                                child: SizedBox(
-                                  width: 220,
-                                  height: 220,
-                                  child: CustomPaint(
-                                    painter: SegmentedRadialPainter(
-                                      bodyFatPercent: _result.bfrPercent,
-                                      musclePercent: _result.slmPercent,
-                                      waterPercent: _result.tfrPercent,
-                                      bonePercent: ((_result.boneMassKg / _result.weightKg) * 100.0),
-                                      colors: const {
-                                        'fat': Color(0xFFFFC857),
-                                        'muscle': Color(0xFF2A9D8F),
-                                        'water': Color(0xFF78C0E0),
-                                        'bone': Color(0xFF9E7AE8),
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 12),
-                              Wrap(
-                                spacing: 12,
-                                runSpacing: 8,
-                                children: [
-                                  _LegendDot(color: Color(0xFFFFC857), label: 'Fat ${_result.bfrPercent.toStringAsFixed(1)}%'),
-                                  _LegendDot(color: Color(0xFF2A9D8F), label: 'Muscle ${_result.slmPercent.toStringAsFixed(1)}%'),
-                                  _LegendDot(color: Color(0xFF78C0E0), label: 'Water ${_result.tfrPercent.toStringAsFixed(1)}%'),
-                                  _LegendDot(color: Color(0xFF9E7AE8), label: 'Bone ${((_result.boneMassKg / _result.weightKg) * 100.0).toStringAsFixed(1)}%'),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // Metric grid container (subtle like insights, with emojis)
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: Offset(0, 6)),
-                        ],
-                      ),
-                      child: Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: [
-                          _MetricCard(emoji: '🧈', title: 'Body Fat', value: '${_result.bfrPercent.toStringAsFixed(1)}%', subtitle: '${_result.fatMassKg.toStringAsFixed(1)} kg', color: Color(0xFFFFC857)),
-                          _MetricCard(emoji: '💧', title: 'Water', value: '${_result.tfrPercent.toStringAsFixed(1)}%', subtitle: 'Hydration', color: Color(0xFF78C0E0)),
-                          _MetricCard(emoji: '⚠️', title: 'Visceral Fat', value: _result.vfr.toStringAsFixed(0), subtitle: 'Rating', color: Color(0xFFE76F51)),
-                          _MetricCard(emoji: '💪', title: 'Muscle Mass', value: '${_result.slmKg.toStringAsFixed(1)} kg', subtitle: '${_result.slmPercent.toStringAsFixed(1)}%', color: Color(0xFF2A9D8F)),
-                          _MetricCard(emoji: '🦴', title: 'Bone Mass', value: '${_result.boneMassKg.toStringAsFixed(1)} kg', subtitle: 'Skeletal', color: Color(0xFF9E7AE8)),
-                          _MetricCard(emoji: '🎂', title: 'Body Age', value: '${_result.bodyAge}', subtitle: 'years', color: Color(0xFF8D99AE)),
-                          _MetricCard(emoji: '⚡', title: 'Impedance', value: '${_result.impedanceOhm.toStringAsFixed(0)} Ω', subtitle: 'Ohms', color: Color(0xFFB8E4C9)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                child: BodyAnalysisContent(result: _result),
               ),
             ),
           ],
@@ -218,6 +74,158 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> {
     );
   }
 
+}
+
+class BodyAnalysisContent extends StatelessWidget {
+  final BodyCompositionResult result;
+
+  const BodyAnalysisContent({required this.result});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(height: 8),
+        Text(
+          'Your Body Composition',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.left,
+        ),
+        SizedBox(height: 8),
+        Text(
+          'Overview of your latest measurement',
+          style: TextStyle(color: Colors.grey[600], fontSize: 14),
+        ),
+        SizedBox(height: 16),
+
+        Container(
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 84,
+                height: 84,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    result.weightKg.toStringAsFixed(1),
+                    style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Weight', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    Text('${result.weightKg.toStringAsFixed(1)} kg', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        _Chip(text: 'BMI ${result.bmi.toStringAsFixed(1)}'),
+                        SizedBox(width: 8),
+                        _Chip(text: 'BMR ${result.bmr.toStringAsFixed(0)} kcal'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        SizedBox(height: 20),
+
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+            child: Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.95),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: Offset(0, 6)),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Composition breakdown', style: TextStyle(fontWeight: FontWeight.w700)),
+                  SizedBox(height: 25),
+                  Center(
+                    child: SizedBox(
+                      width: 220,
+                      height: 220,
+                      child: CustomPaint(
+                        painter: SegmentedRadialPainter(
+                          bodyFatPercent: result.bfrPercent,
+                          musclePercent: result.slmPercent,
+                          waterPercent: result.tfrPercent,
+                          bonePercent: ((result.boneMassKg / result.weightKg) * 100.0),
+                          colors: const {
+                            'fat': Color(0xFFFFC857),
+                            'muscle': Color(0xFF2A9D8F),
+                            'water': Color(0xFF78C0E0),
+                            'bone': Color(0xFF9E7AE8),
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 8,
+                    children: [
+                      _LegendDot(color: Color(0xFFFFC857), label: 'Fat ${result.bfrPercent.toStringAsFixed(1)}%'),
+                      _LegendDot(color: Color(0xFF2A9D8F), label: 'Muscle ${result.slmPercent.toStringAsFixed(1)}%'),
+                      _LegendDot(color: Color(0xFF78C0E0), label: 'Water ${result.tfrPercent.toStringAsFixed(1)}%'),
+                      _LegendDot(color: Color(0xFF9E7AE8), label: 'Bone ${((result.boneMassKg / result.weightKg) * 100.0).toStringAsFixed(1)}%'),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.95),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: Offset(0, 6)),
+            ],
+          ),
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              _MetricCard(emoji: '🧈', title: 'Body Fat', value: '${result.bfrPercent.toStringAsFixed(1)}%', subtitle: '${result.fatMassKg.toStringAsFixed(1)} kg', color: Color(0xFFFFC857)),
+              _MetricCard(emoji: '💧', title: 'Water', value: '${result.tfrPercent.toStringAsFixed(1)}%', subtitle: 'Hydration', color: Color(0xFF78C0E0)),
+              _MetricCard(emoji: '⚠️', title: 'Visceral Fat', value: result.vfr.toStringAsFixed(0), subtitle: 'Rating', color: Color(0xFFE76F51)),
+              _MetricCard(emoji: '💪', title: 'Muscle Mass', value: '${result.slmKg.toStringAsFixed(1)} kg', subtitle: '${result.slmPercent.toStringAsFixed(1)}%', color: Color(0xFF2A9D8F)),
+              _MetricCard(emoji: '🦴', title: 'Bone Mass', value: '${result.boneMassKg.toStringAsFixed(1)} kg', subtitle: 'Skeletal', color: Color(0xFF9E7AE8)),
+              _MetricCard(emoji: '🎂', title: 'Body Age', value: '${result.bodyAge}', subtitle: 'years', color: Color(0xFF8D99AE)),
+              _MetricCard(emoji: '⚡', title: 'Impedance', value: '${result.impedanceOhm.toStringAsFixed(0)} Ω', subtitle: 'Ohms', color: Color(0xFFB8E4C9)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 // Simple themed metric card & chip widgets matching app style

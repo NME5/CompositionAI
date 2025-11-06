@@ -4,7 +4,9 @@ import '../services/bluetooth_scale_service.dart';
 import '../services/data_service.dart';
 import '../models/scale_reading.dart';
 import '../models/body_metrics.dart';
-import 'body_analysis_page.dart';
+// import 'body_analysis_page.dart';
+import '../widgets/dialogs.dart';
+import '../navigation/route_observer.dart';
 
 class ScaleMeasurementPage extends StatefulWidget {
   final Function(String deviceName)? onConnected;
@@ -176,24 +178,14 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
     
     // Navigate to results page with calculated data
     if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          transitionDuration: Duration(milliseconds: 800),
-          reverseTransitionDuration: Duration(milliseconds: 250),
-          pageBuilder: (context, animation, secondaryAnimation) => BodyAnalysisPage(
-            compositionResult: composition,
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
-            final offsetTween = Tween<Offset>(begin: Offset(0, 1), end: Offset.zero);
-            return SlideTransition(
-              position: offsetTween.animate(curved),
-              child: child,
-            );
-          },
-        ),
-      );
+      // Pop measurement page, then show an almost-full-screen, draggable bottom sheet over previous screen
+      Navigator.pop(context);
+      Future.microtask(() {
+        final ctx = appNavigatorKey.currentContext;
+        if (ctx != null) {
+          BodyAnalysisDialog.show(ctx, compositionResult: composition);
+        }
+      });
     }
   }
 

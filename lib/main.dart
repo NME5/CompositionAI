@@ -37,6 +37,7 @@ class BodySyncApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'CompostionAI',
+      navigatorKey: appNavigatorKey,
       theme: ThemeData(
         fontFamily: 'SF Pro Display',
         primarySwatch: Colors.blue,

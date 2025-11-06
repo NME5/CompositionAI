@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../views/scale_measurement_page.dart';
+import '../views/body_analysis_page.dart';
+import '../services/body_composition_calculator.dart';
 
 class ConnectScaleDialog {
   static void show(BuildContext context, {required Function(String deviceName) onConnected}) {
@@ -18,6 +20,124 @@ class ConnectScaleDialog {
 class MeasurementDialog extends StatefulWidget {
   @override
   State<MeasurementDialog> createState() => _MeasurementDialogState();
+}
+
+class BodyAnalysisDialog {
+  static Future<void> show(BuildContext context, {required BodyCompositionResult compositionResult}) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final screenHeight = MediaQuery.of(ctx).size.height;
+        return Container(
+          height: screenHeight * 0.96,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              // Grab handle
+              Padding(
+                padding: EdgeInsets.only(top: 12, bottom: 8),
+                child: Container(
+                  width: 48,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      icon: Icon(Icons.close),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.grey[100],
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                    ),
+                    Text('Body Analysis', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    SizedBox(width: 48),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
+                  child: BodyAnalysisContent(result: compositionResult),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  static Future<void> showFullScreen(BuildContext context, {required BodyCompositionResult compositionResult, bool replaceCurrent = false}) async {
+    final route = PageRouteBuilder(
+      transitionDuration: Duration(milliseconds: 500),
+      reverseTransitionDuration: Duration(milliseconds: 250),
+      fullscreenDialog: true,
+      pageBuilder: (ctx, animation, secondaryAnimation) {
+        final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+        return FadeTransition(
+          opacity: curved,
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          icon: Icon(Icons.close),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.grey[100],
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          ),
+                        ),
+                        Text('Body Analysis', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                        SizedBox(width: 48),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
+                      child: BodyAnalysisContent(result: compositionResult),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      transitionsBuilder: (ctx, animation, secondaryAnimation, child) {
+        final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+        final offsetTween = Tween<Offset>(begin: Offset(0, 0.05), end: Offset.zero);
+        return SlideTransition(position: offsetTween.animate(curved), child: child);
+      },
+    );
+
+    if (replaceCurrent) {
+      await Navigator.pushReplacement(context, route);
+    } else {
+      await Navigator.push(context, route);
+    }
+  }
 }
 
 class _MeasurementDialogState extends State<MeasurementDialog> with TickerProviderStateMixin {
