@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'models/user_profile.dart';
 import 'models/device.dart';
+import 'models/body_metrics.dart';
+import 'navigation/route_observer.dart';
 import 'views/home_page.dart';
 import 'views/analytics_page.dart';
 import 'views/insights_page.dart';
@@ -17,8 +19,16 @@ void main() async {
   if (!Hive.isAdapterRegistered(2)) {
     Hive.registerAdapter(DeviceAdapter());
   }
+  if (!Hive.isAdapterRegistered(3)) {
+    Hive.registerAdapter(BodyMetricsAdapter());
+  }
+  if (!Hive.isAdapterRegistered(4)) {
+    Hive.registerAdapter(MeasurementEntryAdapter());
+  }
   await Hive.openBox<UserProfile>('userProfileBox');
   await Hive.openBox<Device>('boundDeviceBox');
+  await Hive.openBox<BodyMetrics>('metricsBox');
+  await Hive.openBox<MeasurementEntry>('measurementsBox');
   runApp(BodySyncApp());
 }
 
@@ -32,6 +42,7 @@ class BodySyncApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      navigatorObservers: [routeObserver],
       home: MainScreen(),
       debugShowCheckedModeBanner: false,
     );

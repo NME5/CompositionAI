@@ -18,6 +18,12 @@ class DataService {
   static const String _boundDeviceKey = 'device';
   Box<Device> get _boundDeviceBox => Hive.box<Device>(_boundDeviceBoxName);
 
+  static const String _metricsBoxName = 'metricsBox';
+  Box<BodyMetrics> get _metricsBox => Hive.box<BodyMetrics>(_metricsBoxName);
+
+  static const String _measurementsBoxName = 'measurementsBox';
+  Box<MeasurementEntry> get _measurementsBox => Hive.box<MeasurementEntry>(_measurementsBoxName);
+
   // Mock data - replace with actual data fetching logic
   BodyMetrics getCurrentMetrics() {
     return BodyMetrics(
@@ -65,6 +71,36 @@ class DataService {
 
   bool isDeviceBound() {
     return _boundDeviceBox.containsKey(_boundDeviceKey);
+  }
+
+  // Body metrics history
+  Future<void> addBodyMetrics(BodyMetrics metrics) async {
+    await _metricsBox.add(metrics);
+  }
+
+  List<BodyMetrics> getAllBodyMetrics() {
+    return _metricsBox.values.toList(growable: false);
+  }
+
+  Future<void> clearAllBodyMetrics() async {
+    await _metricsBox.clear();
+  }
+
+  // Timestamped measurements (preferred)
+  Future<void> addMeasurement(BodyMetrics metrics, {DateTime? timestamp}) async {
+    final entry = MeasurementEntry(
+      timestamp: timestamp ?? DateTime.now(),
+      metrics: metrics,
+    );
+    await _measurementsBox.add(entry);
+  }
+
+  List<MeasurementEntry> getAllMeasurements() {
+    return _measurementsBox.values.toList(growable: false);
+  }
+
+  Future<void> clearAllMeasurements() async {
+    await _measurementsBox.clear();
   }
 
   HealthScore getHealthScore() {

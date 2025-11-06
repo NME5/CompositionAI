@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/bluetooth_scale_service.dart';
 import '../services/data_service.dart';
 import '../models/scale_reading.dart';
+import '../models/body_metrics.dart';
 import 'body_analysis_page.dart';
 
 class ScaleMeasurementPage extends StatefulWidget {
@@ -146,6 +147,23 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
       return;
     }
     
+    // Persist measurement to history
+    try {
+      _dataService.addMeasurement(
+        BodyMetrics(
+          weight: composition.weightKg,
+          muscleMass: composition.slmKg,
+          bodyFat: composition.bfrPercent,
+          water: composition.tfrPercent,
+          boneMass: composition.boneMassKg,
+          bmr: composition.bmr.round(),
+        ),
+        timestamp: DateTime.now(),
+      );
+    } catch (e) {
+      print('[UI] Failed to save measurement: $e');
+    }
+
     // Stop scanning
     print('[UI] Stopping scanning before navigation');
     _bluetoothService.stopScanning();
