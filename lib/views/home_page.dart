@@ -90,18 +90,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Column(
+                            const Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('CompositionAI', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
                                 SizedBox(height: 4),
-                                Text('Smart Body Analysis', style: TextStyle(color: Colors.grey[600])),
+                                Text('Smart Body Analysis', style: TextStyle(color:Color.fromRGBO(117, 117, 117, 1))), //grey[600]
                               ],
                             ),
                             Container(
-                              width: 48, height: 48,
+                              width: 48, 
+                              height: 48,
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
+                                gradient: const LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: const Padding(
@@ -111,12 +112,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
                             ),
                           ],
                         ),
-                        SizedBox(height: 24),
+                        const SizedBox(height: 24),
                         // Connection Status
                         Container(
-                          padding: EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.grey[100],
+                            color: const Color.fromRGBO(245, 245, 245, 1), //grey[100]
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Row(
@@ -151,13 +152,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
                                       ),
                                     ],
                                   ),
-                                  SizedBox(width: 12),
+                                  const SizedBox(width: 12),
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(_viewModel.deviceName, style: TextStyle(fontWeight: FontWeight.w500)),
                                       Text(_viewModel.isConnected ? 'Binded' : 'Not Binded', 
-                                          style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                                          style: const TextStyle(color: Color.fromRGBO(117, 117, 117, 1), fontSize: 12)), //grey[600]
                                     ],
                                   ),
                                 ],
@@ -170,10 +171,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Color(0xFF9E7AE8),
                                     foregroundColor: Colors.white,
-                                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                   ),
-                                  child: Text('Unbind', style: TextStyle(fontSize: 14)),
+                                  child: const Text('Unbind', style: TextStyle(fontSize: 14)),
                                 ),
                             ],
                           ),
