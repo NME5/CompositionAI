@@ -38,6 +38,10 @@ dependencies:
   # Bluetooth Low Energy for scale connectivity
   flutter_blue_plus: ^1.31.12
 
+  # Local persistence
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

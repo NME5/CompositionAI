@@ -298,7 +298,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () async {
+                        await _dataService.saveUserProfile(_viewModel.userProfile); //save ke hive
+                        if (mounted) Navigator.pop(context);
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF667EEA),
                         foregroundColor: Colors.white,
@@ -418,7 +421,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () async {
+                        await _dataService.saveUserProfile(_viewModel.userProfile); //save ke hive
+                        if (mounted) Navigator.pop(context);
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF667EEA),
                         foregroundColor: Colors.white,
@@ -481,9 +487,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   final gender = genders[index];
                   final isSelected = gender == _viewModel.gender;
                   return InkWell(
-                    onTap: () {
+                    onTap: () async {
                       _viewModel.updateGender(gender);
-                      Navigator.pop(context);
+                      await _dataService.saveUserProfile(_viewModel.userProfile); // save ke hive
+                      if (mounted) Navigator.pop(context);
                     },
                     borderRadius: BorderRadius.circular(16),
                     child: Container(
@@ -561,9 +568,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   final level = activityLevels[index];
                   final isSelected = level == _viewModel.activityLevel;
                   return InkWell(
-                    onTap: () {
+                    onTap: () async {
                       _viewModel.updateActivityLevel(level);
-                      Navigator.pop(context);
+                      await _dataService.saveUserProfile(_viewModel.userProfile); // save ke hive
+                      if (mounted) Navigator.pop(context);
                     },
                     borderRadius: BorderRadius.circular(16),
                     child: Container(

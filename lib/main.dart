@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'models/user_profile.dart';
 import 'views/home_page.dart';
 import 'views/analytics_page.dart';
 import 'views/insights_page.dart';
 import 'views/profile_page.dart';
 import 'widgets/dialogs.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  if (!Hive.isAdapterRegistered(1)) {
+    Hive.registerAdapter(UserProfileAdapter());
+  }
+  await Hive.openBox<UserProfile>('userProfileBox');
   runApp(BodySyncApp());
 }
 

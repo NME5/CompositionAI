@@ -1,3 +1,5 @@
+import 'package:hive/hive.dart';
+
 class UserProfile {
   final String name;
   int age;
@@ -49,5 +51,51 @@ class UserStats {
     required this.daysActive,
     required this.goalsAchieved,
   });
+}
+
+
+// Hive adapter untuk model UserProfile
+class UserProfileAdapter extends TypeAdapter<UserProfile> {
+  @override
+  final int typeId = 1;
+
+  @override
+  UserProfile read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{};
+    for (int i = 0; i < numOfFields; i++) {
+      final key = reader.readByte();
+      fields[key] = reader.read();
+    }
+    return UserProfile(
+      name: fields[0] as String,
+      age: fields[1] as int,
+      height: (fields[2] as num).toDouble(),
+      gender: fields[3] as String,
+      activityLevel: fields[4] as String,
+      membershipType: fields[5] as String,
+      memberSince: fields[6] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, UserProfile obj) {
+    writer
+      ..writeByte(7)
+      ..writeByte(0)
+      ..write(obj.name)
+      ..writeByte(1)
+      ..write(obj.age)
+      ..writeByte(2)
+      ..write(obj.height)
+      ..writeByte(3)
+      ..write(obj.gender)
+      ..writeByte(4)
+      ..write(obj.activityLevel)
+      ..writeByte(5)
+      ..write(obj.membershipType)
+      ..writeByte(6)
+      ..write(obj.memberSince);
+  }
 }
 

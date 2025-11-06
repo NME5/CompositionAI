@@ -2,11 +2,17 @@ import '../models/body_metrics.dart';
 import '../models/user_profile.dart';
 import '../models/insight.dart';
 import '../models/device.dart';
+import 'package:hive/hive.dart';
 
 class DataService {
   static final DataService _instance = DataService._internal();
   factory DataService() => _instance;
   DataService._internal();
+
+  static const String _userProfileBoxName = 'userProfileBox';
+  static const String _userProfileKey = 'profile';
+
+  Box<UserProfile> get _userProfileBox => Hive.box<UserProfile>(_userProfileBoxName);
 
   // Mock data - replace with actual data fetching logic
   BodyMetrics getCurrentMetrics() {
@@ -21,7 +27,9 @@ class DataService {
   }
 
   UserProfile getUserProfile() {
-    return UserProfile(
+    final existing = _userProfileBox.get(_userProfileKey);
+    if (existing != null) return existing;
+    final defaultProfile = UserProfile(
       name: 'Alex Johnson',
       age: 28,
       height: 175,
@@ -30,6 +38,12 @@ class DataService {
       membershipType: 'Premium Member',
       memberSince: DateTime(2023, 1, 1),
     );
+    _userProfileBox.put(_userProfileKey, defaultProfile);
+    return defaultProfile;
+  }
+
+  Future<void> saveUserProfile(UserProfile profile) async {
+    await _userProfileBox.put(_userProfileKey, profile);
   }
 
   HealthScore getHealthScore() {
