@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../services/data_service.dart';
+import '../models/device.dart';
 
 class HomeViewModel extends ChangeNotifier {
+  final DataService _dataService = DataService();
   bool _isConnected = false;
   bool _isScanning = false;
   int _currentStep = 0;
@@ -16,17 +19,35 @@ class HomeViewModel extends ChangeNotifier {
   String get deviceName => _deviceName;
   bool get showUnbindButton => _showUnbindButton;
 
+  Future<void> initializeBinding() async {
+    final device = _dataService.getBoundDevice();
+    if (device != null) {
+      _isConnected = true;
+      _deviceName = device.name;
+      _showUnbindButton = true;
+    } else {
+      _isConnected = false;
+      _deviceName = 'No Scale Connected';
+      _showUnbindButton = false;
+    }
+    notifyListeners();
+  }
+
   void toggleConnection() {
     _isConnected = !_isConnected;
     notifyListeners();
   }
 
-  void bindScale({String? deviceName}) {
+  void bindScale({String? deviceName, String? deviceId}) {
     _isConnected = true;
     if (deviceName != null) {
       _deviceName = deviceName;
     }
     _showUnbindButton = true;
+    _dataService.setBoundDevice(Device(
+      id: deviceId ?? _deviceName,
+      name: _deviceName,
+    ));
     notifyListeners();
   }
 
@@ -34,6 +55,7 @@ class HomeViewModel extends ChangeNotifier {
     _isConnected = false;
     _showUnbindButton = false;
     _deviceName = 'No Scale Connected';
+    _dataService.setBoundDevice(null);
     notifyListeners();
   }
 

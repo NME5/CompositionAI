@@ -16,6 +16,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _viewModel = HomeViewModel();
+    _viewModel.initializeBinding();
     _pulseController = AnimationController(
       duration: Duration(seconds: 2),
       vsync: this,

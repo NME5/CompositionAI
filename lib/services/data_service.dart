@@ -14,6 +14,10 @@ class DataService {
 
   Box<UserProfile> get _userProfileBox => Hive.box<UserProfile>(_userProfileBoxName);
 
+  static const String _boundDeviceBoxName = 'boundDeviceBox';
+  static const String _boundDeviceKey = 'device';
+  Box<Device> get _boundDeviceBox => Hive.box<Device>(_boundDeviceBoxName);
+
   // Mock data - replace with actual data fetching logic
   BodyMetrics getCurrentMetrics() {
     return BodyMetrics(
@@ -44,6 +48,23 @@ class DataService {
 
   Future<void> saveUserProfile(UserProfile profile) async {
     await _userProfileBox.put(_userProfileKey, profile);
+  }
+
+  // Bound device persistence
+  Device? getBoundDevice() {
+    return _boundDeviceBox.get(_boundDeviceKey);
+  }
+
+  Future<void> setBoundDevice(Device? device) async {
+    if (device == null) {
+      await _boundDeviceBox.delete(_boundDeviceKey);
+    } else {
+      await _boundDeviceBox.put(_boundDeviceKey, device);
+    }
+  }
+
+  bool isDeviceBound() {
+    return _boundDeviceBox.containsKey(_boundDeviceKey);
   }
 
   HealthScore getHealthScore() {
@@ -86,14 +107,10 @@ class DataService {
       Device(
         id: '1',
         name: 'BodySync Pro X1',
-        details: 'Signal: Strong • 2.4m away',
-        isStrong: true,
       ),
       Device(
         id: '2',
         name: 'SmartScale Elite',
-        details: 'Signal: Medium • 5.1m away',
-        isStrong: false,
       ),
     ];
   }
