@@ -52,22 +52,30 @@ class BodyAnalysisDialog {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
                   children: [
-                    IconButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      icon: Icon(Icons.close),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.grey[100],
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          icon: Icon(Icons.close),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.grey[100],
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          ),
+                        ),
+                        Text('Body Analysis', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                        SizedBox(width: 48),
+                      ],
                     ),
-                    Text('Body Analysis', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    SizedBox(width: 48),
+                    SizedBox(height: 10,),
+                    
+                    Divider(color: Colors.grey[200], height: 1),
                   ],
                 ),
               ),
+              
               Expanded(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
@@ -97,19 +105,25 @@ class BodyAnalysisDialog {
                 children: [
                   Padding(
                     padding: EdgeInsets.all(24),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
                       children: [
-                        IconButton(
-                          onPressed: () => Navigator.pop(ctx),
-                          icon: Icon(Icons.close),
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.grey[100],
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              icon: Icon(Icons.close),
+                              style: IconButton.styleFrom(
+                                backgroundColor: Colors.grey[100],
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              ),
+                            ),
+                            Text('Body Analysis', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                            SizedBox(width: 48),
+                          ],
                         ),
-                        Text('Body Analysis', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                        SizedBox(width: 48),
+                        SizedBox(height: 10),
+                        Divider(color: Colors.grey[200], height: 1),
                       ],
                     ),
                   ),

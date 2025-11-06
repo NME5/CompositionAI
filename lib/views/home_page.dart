@@ -5,6 +5,7 @@ import '../models/body_metrics.dart';
 import '../widgets/dialogs.dart';
 import '../widgets/shared_widgets.dart';
 import '../navigation/route_observer.dart';
+import '../services/body_composition_calculator.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -282,53 +283,99 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
 
 
     //ui recent activity card
-    return Container(
-      margin: EdgeInsets.only(bottom: 16),
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, spreadRadius: 0)],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text('📊', style: TextStyle(fontSize: 24)),
-                  SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Measurement', style: TextStyle(fontWeight: FontWeight.w600)),
-                      Text(_formatDateTime(dt), style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-                    ],
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text('${bodyFat.toStringAsFixed(1)}%', style: TextStyle(fontWeight: FontWeight.bold)),
-                  if (fatDelta != null)
-                    Text(
-                      '${fatDelta >= 0 ? '↑' : '↓'} ${fatDelta.abs().toStringAsFixed(1)}%',
-                      style: TextStyle(color: fatDelta >= 0 ? Colors.red : Colors.green, fontSize: 12),
+    return InkWell(
+      onTap: () {
+        final profile = _dataService.getUserProfile();
+        final m = entry.metrics;
+        final weightKg = m.weight;
+        final slmKg = m.muscleMass;
+        final bfrPercent = m.bodyFat;
+        final tfrPercent = m.water;
+        final boneMassKg = m.boneMass;
+        final bmr = m.bmr.toDouble();
+        final slmPercent = weightKg > 0 ? (slmKg / weightKg) * 100.0 : 0.0;
+        final fatMassKg = (bfrPercent / 100.0) * weightKg;
+        final bmi = BodyCompositionCalculator.calculateBMI(profile.height.round(), weightKg);
+        final isMale = profile.gender.toLowerCase().startsWith('m');
+        final vfr = BodyCompositionCalculator.calculateVFR(
+          heightCm: profile.height.round(),
+          weightKg: weightKg,
+          age: profile.age,
+          isMale: isMale,
+          impedanceOhm: 0.0,
+        );
+        final bodyAge = BodyCompositionCalculator.calculateBodyAge(
+          heightCm: profile.height.round(),
+          weightKg: weightKg,
+          age: profile.age,
+          isMale: isMale,
+          impedanceOhm: 0.0,
+        );
+
+        final result = BodyCompositionResult(
+          weightKg: weightKg,
+          impedanceOhm: 0.0,
+          bfrPercent: bfrPercent,
+          fatMassKg: fatMassKg,
+          vfr: vfr,
+          tfrPercent: tfrPercent,
+          slmKg: slmKg,
+          slmPercent: slmPercent,
+          boneMassKg: boneMassKg,
+          bmr: bmr,
+          bodyAge: bodyAge,
+          bmi: bmi,
+        );
+        BodyAnalysisDialog.show(context, compositionResult: result);
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 16),
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, spreadRadius: 0)],
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Text('📊', style: TextStyle(fontSize: 24)),
+                    SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Measurement', style: TextStyle(fontWeight: FontWeight.w600)),
+                        Text(_formatDateTime(dt), style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                      ],
                     ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-          Row(
-            children: [
-              Text('Weight: ', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-              Text('${weight.toStringAsFixed(1)} kg', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w500, fontSize: 12)),
-            ],
-          ),
-        ],
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('${bodyFat.toStringAsFixed(1)}%', style: TextStyle(fontWeight: FontWeight.bold)),
+                    if (fatDelta != null)
+                      Text(
+                        '${fatDelta >= 0 ? '↑' : '↓'} ${fatDelta.abs().toStringAsFixed(1)}%',
+                        style: TextStyle(color: fatDelta >= 0 ? Colors.red : Colors.green, fontSize: 12),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            Row(
+              children: [
+                Text('Weight: ', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                Text('${weight.toStringAsFixed(1)} kg', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w500, fontSize: 12)),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
