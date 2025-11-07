@@ -44,9 +44,17 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Analytics', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text('Analytics', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                                ),
                                 SizedBox(height: 4),
-                                Text('Detailed body composition insights', style: TextStyle(color: Colors.grey[600])),
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text('Detailed body composition insights', style: TextStyle(color: Colors.grey[600])),
+                                ),
                               ],
                             ),
                             
@@ -115,25 +123,25 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                               ),
                               child: Column(
                                 children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('Body Fat Percentage', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                      Row(
-                                        children: [
-                                          Text('18.2%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                                          SizedBox(width: 8),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: Colors.green[50],
-                                              borderRadius: BorderRadius.circular(12),
-                                            ),
-                                            child: Text('↓ 2.1%', style: TextStyle(color: Colors.green, fontSize: 12)),
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: Row(
+                                      children: [
+                                        Text('Body Fat Percentage', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                        SizedBox(width: 10),
+                                        Text('18.2%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                        SizedBox(width: 8),
+                                        Container(
+                                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green[50],
+                                            borderRadius: BorderRadius.circular(10),
                                           ),
-                                        ],
-                                      ),
-                                    ],
+                                          child: Text('↓ 2.1%', style: TextStyle(color: Colors.green, fontSize: 12)),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   SizedBox(height: 16),
                                   Container(
@@ -145,9 +153,27 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                                   ),
                                   SizedBox(height: 16),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-                                        .map((day) => Text(day, style: TextStyle(color: Colors.grey[500], fontSize: 12)))
+                                    children: _viewModel.xAxisLabels
+                                        .map(
+                                          (label) => Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 2),
+                                              child: FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: Text(
+                                                  label,
+                                                  textAlign: TextAlign.center,
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    color: Colors.grey[500],
+                                                    fontSize: _viewModel.xAxisLabels.length > 7 ? 10 : 12,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        )
                                         .toList(),
                                   ),
                                 ],

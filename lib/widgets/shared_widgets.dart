@@ -102,7 +102,7 @@ class MetricCard extends StatelessWidget {
 }
 
 class ChartPainter extends CustomPainter {
-  final List<Map<String, dynamic>> data;
+  final List<Map<String, num>> data;
 
   ChartPainter(this.data);
 
@@ -113,9 +113,15 @@ class ChartPainter extends CustomPainter {
       ..strokeWidth = 3
       ..strokeCap = StrokeCap.round;
 
+    if (data.length < 2) {
+      return;
+    }
+
     final points = data.map((d) {
-      final x = (d['x'] as int) * (size.width / (data.length - 1));
-      final y = size.height * (1 - (d['y'] as double));
+      final xValue = d['x']?.toDouble() ?? 0.0;
+      final yValue = d['y']?.toDouble() ?? 0.0;
+      final x = xValue * (size.width / (data.length - 1));
+      final y = size.height * (1 - yValue);
       return Offset(x, y);
     }).toList();
 
@@ -138,6 +144,21 @@ class ChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant ChartPainter oldDelegate) {
+    if (identical(oldDelegate.data, data)) {
+      return false;
+    }
+    if (oldDelegate.data.length != data.length) {
+      return true;
+    }
+    for (var i = 0; i < data.length; i++) {
+      final current = data[i];
+      final previous = oldDelegate.data[i];
+      if (current['x'] != previous['x'] || current['y'] != previous['y']) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
