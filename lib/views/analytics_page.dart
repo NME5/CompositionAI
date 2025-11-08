@@ -14,6 +14,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   void initState() {
     super.initState();
     _viewModel = AnalyticsViewModel();
+    _viewModel.load();
   }
 
   @override
@@ -130,7 +131,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                                       children: [
                                         Text('Body Fat Percentage', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                                         SizedBox(width: 10),
-                                        Text('18.2%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                        Text(_viewModel.bodyFatPercentText, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                                         SizedBox(width: 8),
                                         Container(
                                           padding: EdgeInsets.symmetric(horizontal: 6, vertical: 5),
@@ -138,7 +139,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                                             color: Colors.green[50],
                                             borderRadius: BorderRadius.circular(10),
                                           ),
-                                          child: Text('↓ 2.1%', style: TextStyle(color: Colors.green, fontSize: 12)),
+                                          child: Text(_viewModel.bodyFatDeltaText.isEmpty ? '—' : _viewModel.bodyFatDeltaText, style: TextStyle(color: Colors.green, fontSize: 12)),
                                         ),
                                       ],
                                     ),
@@ -189,10 +190,10 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                               mainAxisSpacing: 16,
                               crossAxisSpacing: 16,
                               children: [
-                                MetricCard(emoji: '💪', value: '42.8%', label: 'Muscle Mass', change: '+1.2%', color: Colors.green),
-                                MetricCard(emoji: '💧', value: '58.4%', label: 'Water', change: '+0.8%', color: Colors.blue),
-                                MetricCard(emoji: '🦴', value: '3.2kg', label: 'Bone Mass', change: '0.0%', color: Colors.grey),
-                                MetricCard(emoji: '⚡', value: '1,847', label: 'BMR (kcal)', change: '+45', color: Colors.orange),
+                                MetricCard(emoji: '💪', value: _viewModel.muscleMassText, label: 'Muscle Mass', change: _viewModel.muscleDeltaText, color: Colors.green),
+                                MetricCard(emoji: '💧', value: _viewModel.waterText, label: 'Water', change: _viewModel.waterDeltaText, color: Colors.blue),
+                                MetricCard(emoji: '🦴', value: _viewModel.boneMassText, label: 'Bone Mass', change: _viewModel.boneDeltaText, color: Colors.grey),
+                                MetricCard(emoji: '⚡', value: _viewModel.bmrText, label: 'BMR (kcal)', change: _viewModel.bmrDeltaText, color: Colors.orange),
                               ],
                             ),
                             SizedBox(height: 100),

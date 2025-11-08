@@ -1,10 +1,31 @@
 import 'package:flutter/material.dart';
+import '../services/data_service.dart';
+import '../models/body_metrics.dart';
 
 class AnalyticsViewModel extends ChangeNotifier {
   final List<String> _periods = ['7D', '1M', '3M', '1Y'];
   String _selectedPeriod = '7D';
+  final DataService _dataService = DataService();
+
+  List<MeasurementEntry> _allMeasurements = [];
 
   String get selectedPeriod => _selectedPeriod;
+
+  BodyMetrics? get currentMetrics {
+    if (_allMeasurements.isNotEmpty) {
+      return _allMeasurements.last.metrics;
+    }
+    // Fallback to current metrics if no history yet
+    return _dataService.getCurrentMetrics();
+  }
+
+  Future<void> load() async {
+    // Synchronous Hive read; keep API async for future-proofing
+    final list = _dataService.getAllMeasurements();
+    list.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    _allMeasurements = list;
+    notifyListeners();
+  }
 
   void selectPeriod(String period) {
     if (_periods.contains(period) && period != _selectedPeriod) {
@@ -14,68 +35,97 @@ class AnalyticsViewModel extends ChangeNotifier {
   }
 
   List<Map<String, num>> get chartData {
-    switch (_selectedPeriod) {
-      case '1M':
-        return [
-          {'x': 0, 'y': 0.82},
-          {'x': 1, 'y': 0.8},
-          {'x': 2, 'y': 0.79},
-          {'x': 3, 'y': 0.78},
-          {'x': 4, 'y': 0.77},
-          {'x': 5, 'y': 0.75},
-        ];
-      case '3M':
-        return [
-          {'x': 0, 'y': 0.88},
-          {'x': 1, 'y': 0.87},
-          {'x': 2, 'y': 0.86},
-          {'x': 3, 'y': 0.84},
-          {'x': 4, 'y': 0.83},
-          {'x': 5, 'y': 0.81},
-          {'x': 6, 'y': 0.8},
-          {'x': 7, 'y': 0.79},
-        ];
-      case '1Y':
-        return [
-          {'x': 0, 'y': 0.95},
-          {'x': 1, 'y': 0.93},
-          {'x': 2, 'y': 0.91},
-          {'x': 3, 'y': 0.89},
-          {'x': 4, 'y': 0.87},
-          {'x': 5, 'y': 0.85},
-          {'x': 6, 'y': 0.83},
-          {'x': 7, 'y': 0.82},
-          {'x': 8, 'y': 0.81},
-          {'x': 9, 'y': 0.8},
-          {'x': 10, 'y': 0.79},
-          {'x': 11, 'y': 0.78},
-        ];
-      case '7D':
-      default:
-        return [
-          {'x': 0, 'y': 0.8},
-          {'x': 1, 'y': 0.7},
-          {'x': 2, 'y': 0.65},
-          {'x': 3, 'y': 0.6},
-          {'x': 4, 'y': 0.58},
-          {'x': 5, 'y': 0.52},
-          {'x': 6, 'y': 0.5},
-        ];
-    }
+    final filtered = _filteredMeasurementsForSelectedPeriod();
+    if (filtered.isEmpty) return [];
+    // Plot body fat percentage as 0..1
+    return List.generate(filtered.length, (i) {
+      final m = filtered[i];
+      final y = (m.metrics.bodyFat) / 100.0;
+      return {'x': i, 'y': y};
+    });
   }
 
   List<String> get xAxisLabels {
+    final filtered = _filteredMeasurementsForSelectedPeriod();
+    if (filtered.isEmpty) return [];
+    return filtered.map((m) => _formatShortDate(m.timestamp)).toList();
+  }
+
+  String get bodyFatPercentText {
+    final cm = currentMetrics;
+    if (cm == null) return '--';
+    return '${cm.bodyFat.toStringAsFixed(1)}%';
+  }
+
+  String get bodyFatDeltaText {
+    final delta = _deltaFor((m) => m.metrics.bodyFat);
+    if (delta == null) return '';
+    final arrow = delta >= 0 ? '↑' : '↓';
+    return '$arrow ${delta.abs().toStringAsFixed(1)}%';
+  }
+
+  // Expose other metric values and deltas
+  String get muscleMassText => _formatNumber(currentMetrics?.muscleMass, suffix: '%');
+  String get muscleDeltaText => _formatDelta(_deltaFor((m) => m.metrics.muscleMass), suffix: '%');
+  String get waterText => _formatNumber(currentMetrics?.water, suffix: '%');
+  String get waterDeltaText => _formatDelta(_deltaFor((m) => m.metrics.water), suffix: '%');
+  String get boneMassText => _formatNumber(currentMetrics?.boneMass, suffix: 'kg');
+  String get boneDeltaText => _formatDelta(_deltaFor((m) => m.metrics.boneMass), suffix: 'kg');
+  String get bmrText => _formatNumber(currentMetrics?.bmr.toDouble(), fractionDigits: 0);
+  String get bmrDeltaText => _formatDelta(_deltaFor((m) => m.metrics.bmr.toDouble()), fractionDigits: 0);
+
+  // Helpers
+  List<MeasurementEntry> _filteredMeasurementsForSelectedPeriod() {
+    if (_allMeasurements.isEmpty) return [];
+    final now = DateTime.now();
+    DateTime start;
     switch (_selectedPeriod) {
       case '1M':
-        return ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Today'];
+        start = DateTime(now.year, now.month - 1, now.day);
+        break;
       case '3M':
-        return ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Today'];
+        start = DateTime(now.year, now.month - 3, now.day);
+        break;
       case '1Y':
-        return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        start = DateTime(now.year - 1, now.month, now.day);
+        break;
       case '7D':
       default:
-        return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        start = now.subtract(Duration(days: 7));
+        break;
     }
+    final list = _allMeasurements.where((m) => !m.timestamp.isBefore(start)).toList();
+    if (list.isEmpty) return _allMeasurements.length <= 20 ? _allMeasurements : _allMeasurements.sublist(_allMeasurements.length - 20);
+    return list;
+  }
+
+  double? _deltaFor(double Function(MeasurementEntry) selector) {
+    final filtered = _filteredMeasurementsForSelectedPeriod();
+    if (filtered.isEmpty) return null;
+    final first = selector(filtered.first);
+    final last = selector(filtered.last);
+    return last - first;
+  }
+
+  String _formatShortDate(DateTime dt) {
+    // Format as M/d or d MMM depending on period
+    final isYear = _selectedPeriod == '1Y';
+    if (isYear) {
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return months[dt.month - 1];
+    }
+    return '${dt.month}/${dt.day}';
+  }
+
+  String _formatNumber(double? value, {String suffix = '', int fractionDigits = 1}) {
+    if (value == null) return '--';
+    return '${value.toStringAsFixed(fractionDigits)}${suffix.isNotEmpty ? ' $suffix' : ''}';
+    }
+
+  String _formatDelta(double? delta, {String suffix = '', int fractionDigits = 1}) {
+    if (delta == null) return '';
+    final arrow = delta >= 0 ? '↑' : '↓';
+    return '$arrow ${delta.abs().toStringAsFixed(fractionDigits)}${suffix.isNotEmpty ? ' $suffix' : ''}';
   }
 }
 

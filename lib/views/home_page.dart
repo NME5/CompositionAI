@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
     final all = _dataService.getAllMeasurements();
     all.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     setState(() {
-      _recent = all.take(3).toList(growable: false);
+      _recent = all.toList(growable: false);
     });
   }
 
