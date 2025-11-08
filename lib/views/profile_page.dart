@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../viewmodels/profile_view_model.dart';
 import '../services/data_service.dart';
+import 'credits_page.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -154,6 +155,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         _buildActionRow('Help Center'),
                         _buildActionRow('Privacy Policy'),
                         _buildActionRow('Terms of Service'),
+                        _buildActionRow('Credits', onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => CreditsPage()),
+                          );
+                        }),
                         _buildActionRow('Sign Out', color: Colors.red),
                       ]),
                       SizedBox(height: 100),
@@ -717,9 +724,9 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildActionRow(String title, {Color? color}) {
+  Widget _buildActionRow(String title, {Color? color, VoidCallback? onTap}) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 12),
         child: Row(
