@@ -57,7 +57,7 @@ class _InsightsPageState extends State<InsightsPage> {
                             Container(
                               width: 48, height: 48,
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(colors: [Color(0xFFF093FB), Color(0xFFF5576C)]),
+                                gradient: LinearGradient(colors: [Color(0xFFFFB6E1), Color(0xFFFFC0CB)]), // Pastel pink gradient
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Center(child: Text('🧠', style: TextStyle(fontSize: 20))),
@@ -81,7 +81,7 @@ class _InsightsPageState extends State<InsightsPage> {
                                 Container(
                                   width: 48, height: 48,
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
+                                    gradient: LinearGradient(colors: [Color(0xFFB5B9FF), Color(0xFFD4B5FF)]), // Pastel purple gradient
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Icon(Icons.smart_toy, color: Colors.white),
@@ -100,7 +100,7 @@ class _InsightsPageState extends State<InsightsPage> {
                             Container(
                               padding: EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(colors: [Colors.green[50]!, Colors.blue[50]!]),
+                                gradient: LinearGradient(colors: [Color(0xFFE8F5E9), Color(0xFFE3F2FD)]), // Pastel green to pastel blue
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Column(
@@ -183,7 +183,7 @@ class _InsightsPageState extends State<InsightsPage> {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(rec.priorityColor).withOpacity(0.1),
+        color: _getPastelColor(Color(rec.priorityColor)).withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -191,7 +191,7 @@ class _InsightsPageState extends State<InsightsPage> {
           Container(
             width: 40, height: 40,
             decoration: BoxDecoration(
-              color: Color(rec.priorityColor),
+              color: _getPastelColor(Color(rec.priorityColor)),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(child: Text(rec.emoji, style: TextStyle(fontSize: 16))),
@@ -208,10 +208,10 @@ class _InsightsPageState extends State<InsightsPage> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Color(rec.priorityColor).withOpacity(0.2),
+                    color: _getPastelColor(Color(rec.priorityColor)).withOpacity(0.3),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(rec.priority, style: TextStyle(color: Color(rec.priorityColor), fontSize: 10)),
+                  child: Text(rec.priority, style: TextStyle(color: _getPastelColor(Color(rec.priorityColor)), fontSize: 10)),
                 ),
               ],
             ),
@@ -232,7 +232,7 @@ class _InsightsPageState extends State<InsightsPage> {
             value: score / 100,
             strokeWidth: 8,
             backgroundColor: Colors.grey[200],
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFA5D6A7)), // Pastel green
           ),
         ),
         Column(
@@ -246,12 +246,19 @@ class _InsightsPageState extends State<InsightsPage> {
   }
 
   Widget _buildScoreDetail(String score, String label, Color color) {
+    final pastelColor = _getPastelColor(color);
     return Column(
       children: [
-        Text(score, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
+        Text(score, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: pastelColor)),
         Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 10)),
       ],
     );
+  }
+
+  // Convert a color to its pastel version
+  Color _getPastelColor(Color color) {
+    // Mix the color with white to create a pastel version
+    return Color.lerp(color, Colors.white, 0.5) ?? color;
   }
 }
 

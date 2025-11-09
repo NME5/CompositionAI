@@ -280,6 +280,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
     final prevWeight = previous?.metrics.weight;
     final weightDelta = prevWeight != null ? (weight - prevWeight) : null;
 
+    // Color wheel - cycling through gradients
+    final colorWheel = [
+      [Color(0xFF667EEA), Color(0xFF764BA2)], // Purple gradient
+      [Color(0xFFFFECD2), Color(0xFFFCB69F)], // Peach gradient
+      [Color(0xFFA8EDEA), Color(0xFFFED6E3)], // Mint-Pink gradient
+      [Color(0xFFFF9A9E), Color(0xFFFAD0C4)], // Coral gradient
+      [Color(0xFFA1C4FD), Color(0xFFC2E9FB)], // Blue gradient
+      [Color(0xFFFFD1DC), Color(0xFFFFB6C1)], // Pink gradient
+    ];
+    final gradientColors = colorWheel[index % colorWheel.length];
+
     return InkWell(
       onTap: () {
         final profile = _dataService.getUserProfile();
@@ -342,11 +353,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: index == 0 
-                    ? [Color(0xFF667EEA), Color(0xFF764BA2)]
-                    : [Color(0xFF667EEA).withOpacity(0.3), Color(0xFF764BA2).withOpacity(0.3)],
-                ),
+                gradient: LinearGradient(colors: gradientColors),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
