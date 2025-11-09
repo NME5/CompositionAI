@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../services/data_service.dart';
 import '../models/device.dart';
+import '../models/body_metrics.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final DataService _dataService = DataService();
@@ -94,6 +95,47 @@ class HomeViewModel extends ChangeNotifier {
   void updateProgress(double value) {
     _progress = value;
     notifyListeners();
+  }
+
+  /// Formats a body measurement date ke last measurement, dan format ke x days ago, x weeks ago, x months ago, x years ago, atau date
+  /// [entry] - The measurement entry to format
+  /// [isFirst] - Whether this is the first/most recent item (for "Last measurement" label)
+  String formatRelativeDate(MeasurementEntry entry, {bool isFirst = false}) {
+    final dt = entry.timestamp;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final measurementDate = DateTime(dt.year, dt.month, dt.day);
+    final difference = today.difference(measurementDate).inDays;
+
+    // Format time
+    final hh = dt.hour.toString().padLeft(2, '0');
+    final mm = dt.minute.toString().padLeft(2, '0');
+    final timeStr = '$hh:$mm';
+
+    if (difference == 0) {
+      // Today
+      return isFirst ? 'Today at $timeStr' : 'Today, $timeStr';
+    } else if (difference == 1) {
+      // Yesterday
+      return 'Yesterday at $timeStr';
+    } else if (difference < 7) {
+      // 2-6 days ago
+      return '$difference days ago';
+    } else if (difference < 14) {
+      // 1 week ago
+      return '1 week ago';
+    } else if (difference < 30) {
+      // Weeks ago
+      final weeks = (difference / 7).floor();
+      return '$weeks ${weeks == 1 ? 'week' : 'weeks'} ago';
+    } else if (difference < 365) {
+      // Months ago
+      final months = (difference / 30).floor();
+      return '$months ${months == 1 ? 'month' : 'months'} ago';
+    } else {
+      // Years ago or fallback to date
+      return '${dt.day}/${dt.month}/${dt.year}';
+    }
   }
 }
 

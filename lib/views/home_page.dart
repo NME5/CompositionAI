@@ -237,7 +237,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
                           ...List.generate(_recent.length, (i) {
                             final entry = _recent[i];
                             final prev = i + 1 < _recent.length ? _recent[i + 1] : null;
-                            return _buildRecentActivityCardFrom(entry, previous: prev);
+                            return _buildRecentActivityCardFrom(entry, index: i, totalCount: _recent.length, previous: prev);
                           }),
                         SizedBox(height: 100),
                       ],
@@ -275,15 +275,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
     );
   }
 
-  Widget _buildRecentActivityCardFrom(MeasurementEntry entry, {MeasurementEntry? previous}) {
-    final dt = entry.timestamp;
+  Widget _buildRecentActivityCardFrom(MeasurementEntry entry, {required int index, required int totalCount, MeasurementEntry? previous}) {
     final weight = entry.metrics.weight;
-    final bodyFat = entry.metrics.bodyFat;
-    final prevFat = previous?.metrics.bodyFat;
-    final fatDelta = prevFat != null ? (bodyFat - prevFat) : null;
+    final prevWeight = previous?.metrics.weight;
+    final weightDelta = prevWeight != null ? (weight - prevWeight) : null;
 
-
-    //ui recent activity card
     return InkWell(
       onTap: () {
         final profile = _dataService.getUserProfile();
@@ -329,51 +325,126 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
         );
         BodyAnalysisDialog.show(context, compositionResult: result);
       },
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        margin: EdgeInsets.only(bottom: 16),
+        margin: EdgeInsets.only(bottom: 12),
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, spreadRadius: 0)],
         ),
-        child: Column(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Text('📊', style: TextStyle(fontSize: 24)),
-                    SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Measurement', style: TextStyle(fontWeight: FontWeight.w600)),
-                        Text(_formatDateTime(dt), style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-                      ],
-                    ),
-                  ],
+            // Icon/Indicator
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: index == 0 
+                    ? [Color(0xFF667EEA), Color(0xFF764BA2)]
+                    : [Color(0xFF667EEA).withOpacity(0.3), Color(0xFF764BA2).withOpacity(0.3)],
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text('${bodyFat.toStringAsFixed(1)}%', style: TextStyle(fontWeight: FontWeight.bold)),
-                    if (fatDelta != null)
-                      Text(
-                        '${fatDelta >= 0 ? '↑' : '↓'} ${fatDelta.abs().toStringAsFixed(1)}%',
-                        style: TextStyle(color: fatDelta >= 0 ? Colors.red : Colors.green, fontSize: 12),
-                      ),
-                  ],
-                ),
-              ],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text('📊', style: TextStyle(fontSize: 20)),
+              ),
             ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Text('Weight: ', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-                Text('${weight.toStringAsFixed(1)} kg', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w500, fontSize: 12)),
-              ],
+            SizedBox(width: 16),
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              index == 0 
+                                ? 'Last measurement' 
+                                : 'Measurement #${totalCount - index}',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              _viewModel.formatRelativeDate(entry, isFirst: index == 0),
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(Icons.monitor_weight, size: 14, color: Colors.grey[500]),
+                      SizedBox(width: 6),
+                      Text(
+                        'Weight: ',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      ),
+                      Text(
+                        '${weight.toStringAsFixed(1)} kg',
+                        style: TextStyle(
+                          color: Color(0xFF667EEA),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                      if (weightDelta != null) ...[
+                        SizedBox(width: 8),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                weightDelta >= 0 ? Icons.arrow_upward : Icons.arrow_downward,
+                                size: 12,
+                                color: weightDelta >= 0 ? Colors.red : Colors.green,
+                              ),
+                              SizedBox(width: 2),
+                              Text(
+                                '${weightDelta.abs().toStringAsFixed(1)} kg',
+                                style: TextStyle(
+                                  color: weightDelta >= 0 ? Colors.red : Colors.green,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 8),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Colors.grey[400],
             ),
           ],
         ),
@@ -381,18 +452,5 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
     );
   }
 
-  String _formatDateTime(DateTime dt) {
-    final now = DateTime.now();
-    final isToday = dt.year == now.year && dt.month == now.month && dt.day == now.day;
-    final time = TimeOfDay.fromDateTime(dt);
-    final hh = time.hourOfPeriod.toString().padLeft(2, '0');
-    final mm = time.minute.toString().padLeft(2, '0');
-    final ampm = time.period == DayPeriod.am ? 'AM' : 'PM';
-    if (isToday) return 'Today, $hh:$mm $ampm';
-    final yesterday = now.subtract(Duration(days: 1));
-    final isYesterday = dt.year == yesterday.year && dt.month == yesterday.month && dt.day == yesterday.day;
-    if (isYesterday) return 'Yesterday, $hh:$mm $ampm';
-    return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}, $hh:$mm $ampm';
-  }
 }
 
