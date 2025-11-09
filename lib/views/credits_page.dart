@@ -6,52 +6,43 @@ class CreditsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xFFF9FAFB),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: EdgeInsets.fromLTRB(24, 32, 24, 24),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.arrow_back),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.grey[200],
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Padding(
+                padding: EdgeInsets.fromLTRB(24, 32, 24, 24),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.arrow_back),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.grey[200],
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Credits', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-                        Text('About CompositionAI', style: TextStyle(color: Colors.grey[600])),
-                      ],
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Credits', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                          Text('About CompositionAI', style: TextStyle(color: Colors.grey[600])),
+                        ],
+                      ),
                     ),
-                  ),
-                  // Container(
-                  //   width: 48,
-                  //   height: 48,
-                  //   decoration: BoxDecoration(
-                  //     gradient: LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
-                  //     borderRadius: BorderRadius.circular(16),
-                  //   ),
-                  //   child: Icon(Icons.info_outline, color: Colors.white),
-                  // ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            // Content
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+              // Content
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                       _buildSection('Project Researcher',
                       [
                         _buildLongTeamMemberCard(
@@ -59,6 +50,7 @@ class CreditsPage extends StatelessWidget {
                           role: 'Researcher I',
                           description: 'Researched BLE communication protocols and explored AI methods, including Bayesian logistic regression for predictive analysis.',
                           gradientColors: [Color(0xFFFFECD2), Color(0xFFFCB69F)],
+                          imagePath: 'assets/img/credits/timothy_juwono.jpg',
                         ),
                         SizedBox(height: 12),
                         _buildLongTeamMemberCard(
@@ -66,6 +58,7 @@ class CreditsPage extends StatelessWidget {
                           role: 'Researcher II',
                           description: 'Studied Type 2 Diabetes correlations to support prediction logic and recommendation design using Bayesian logistic regression.',
                           gradientColors: [Color(0xFFFFECD2), Color(0xFFFCB69F)],
+                          imagePath: 'assets/img/credits/lionel_winston_sengkey.jpg',
                         ),
                       ]
                       ),
@@ -81,13 +74,15 @@ class CreditsPage extends StatelessWidget {
                             role: 'Lead Developer',
                             description: 'Built the Flutter app, implemented one-way BLE communication to receive data from the scale, and integrated an on-device AI model for smart data processing and insights.',
                             gradientColors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                            imagePath: 'assets/img/credits/timothy_juwono.jpg',
                           ),
                           SizedBox(height: 12),
                           _buildLongTeamMemberCard(
                             name: 'Lionel Winston Sengkey',
-                            role: 'UI/UX Designer',
+                            role: 'UI/UX Advisor',
                             description: 'Provided design direction throughout development, refined interface decisions, and delivered usability feedback to improve clarity, interaction flow, and overall user experience.',
                             gradientColors: [Color(0xFFFFECD2), Color(0xFFFCB69F)],
+                            imagePath: 'assets/img/credits/lionel_winston_sengkey.jpg',
                           ),
                         ],
                       ),
@@ -120,58 +115,61 @@ class CreditsPage extends StatelessWidget {
 
                       SizedBox(height: 24),
 
-                      // Acknowledgments
-                      _buildSection(
-                        'Acknowledgments',
-                        [
-                          _buildAcknowledgmentCard(
-                            title: 'Open Source Community',
-                            description: 'Thanks to all the open source contributors and libraries that made this app possible.',
-                          ),
-                          SizedBox(height: 12),
-                          _buildAcknowledgmentCard(
-                            title: 'Health & Fitness Research',
-                            description: 'Body composition calculations based on established medical research and standards.',
-                          ),
-                        ],
-                      ),
+                      // // Acknowledgments
+                      // _buildSection(
+                      //   'Acknowledgments',
+                      //   [
+                      //     _buildAcknowledgmentCard(
+                      //       title: 'Open Source Community',
+                      //       description: 'Thanks to all the open source contributors and libraries that made this app possible.',
+                      //     ),
+                      //     SizedBox(height: 12),
+                      //     _buildAcknowledgmentCard(
+                      //       title: 'Health & Fitness Research',
+                      //       description: 'Body composition calculations based on established medical research and standards.',
+                      //     ),
+                      //   ],
+                      // ),
 
-                      SizedBox(height: 24),
+                      // SizedBox(height: 24),
 
                       // Footer
                       Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Made with ❤️',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[700],
+                        padding: const EdgeInsets.only(top: 32),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Made with ❤️',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[700],
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              '© 2024 CompositionAI. All rights reserved.',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
+                              SizedBox(height: 6),
+                              Text(
+                                '© 2025 CompositionAI',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
 
-                      SizedBox(height: 100),
+                      SizedBox(height: 20),
                     ],
                   ),
                 ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -237,6 +235,7 @@ class CreditsPage extends StatelessWidget {
     required String role,
     required String description,
     List<Color>? gradientColors,
+    String? imagePath,
   }) {
     final colors = gradientColors ?? [Color(0xFFFFECD2), Color(0xFFFCB69F)];
     
@@ -257,10 +256,21 @@ class CreditsPage extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: colors),
+                  gradient: imagePath == null ? LinearGradient(colors: colors) : null,
                   borderRadius: BorderRadius.circular(16),
+                  color: imagePath == null ? null : Colors.transparent,
                 ),
-                child: Icon(Icons.person, color: Colors.grey[800], size: 24),
+                child: imagePath != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.asset(
+                          imagePath,
+                          width: 48,
+                          height: 48,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Icon(Icons.person, color: Colors.grey[800], size: 24),
               ),
               SizedBox(width: 16),
               Expanded(

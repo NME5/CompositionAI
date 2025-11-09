@@ -68,6 +68,8 @@ flutter:
   assets:
     - assets/img/Logo CompositionAI.png
     - assets/img/Composition Scale.png
+    - assets/img/credits/lionel_winston_sengkey.jpg
+    - assets/img/credits/timothy_juwono.jpg
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
