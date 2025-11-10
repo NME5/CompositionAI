@@ -9,6 +9,7 @@ import 'views/analytics_page.dart';
 import 'views/insights_page.dart';
 import 'views/profile_page.dart';
 import 'widgets/dialogs.dart';
+// import 'services/data_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +30,14 @@ void main() async {
   await Hive.openBox<Device>('boundDeviceBox');
   await Hive.openBox<BodyMetrics>('metricsBox');
   await Hive.openBox<MeasurementEntry>('measurementsBox');
+  
+  // // Update nama user di profile
+  // final dataService = DataService();
+  // final existingProfile = dataService.getUserProfile();
+  // if (existingProfile.name == 'Lionel Winston Sengkey') {
+  //   await dataService.updateUserName('Timothy Juwono');
+  // }
+  
   runApp(BodySyncApp());
 }
 

@@ -55,6 +55,15 @@ class DataService {
     await _userProfileBox.put(_userProfileKey, profile);
   }
 
+  // Update user profile name
+  Future<void> updateUserName(String newName) async {
+    final existing = _userProfileBox.get(_userProfileKey);
+    if (existing != null) {
+      final updatedProfile = existing.copyWith(name: newName);
+      await _userProfileBox.put(_userProfileKey, updatedProfile);
+    }
+  }
+
   // Bound device persistence
   Device? getBoundDevice() {
     return _boundDeviceBox.get(_boundDeviceKey);
