@@ -16,7 +16,6 @@ class ProfileViewModel extends ChangeNotifier {
         height: 175.0,
         gender: 'Male',
         activityLevel: 'Moderately Active',
-        membershipType: 'Premium',
         memberSince: DateTime.now(),
       );
 

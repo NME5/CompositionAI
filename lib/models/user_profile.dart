@@ -6,7 +6,6 @@ class UserProfile {
   double height;
   String gender;
   String activityLevel;
-  final String membershipType;
   final DateTime memberSince;
 
   UserProfile({
@@ -15,7 +14,6 @@ class UserProfile {
     required this.height,
     required this.gender,
     required this.activityLevel,
-    required this.membershipType,
     required this.memberSince,
   });
 
@@ -26,7 +24,6 @@ class UserProfile {
     double? height,
     String? gender,
     String? activityLevel,
-    String? membershipType,
     DateTime? memberSince,
   }) {
     return UserProfile(
@@ -35,7 +32,6 @@ class UserProfile {
       height: height ?? this.height,
       gender: gender ?? this.gender,
       activityLevel: activityLevel ?? this.activityLevel,
-      membershipType: membershipType ?? this.membershipType,
       memberSince: memberSince ?? this.memberSince,
     );
   }
@@ -73,15 +69,14 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
       height: (fields[2] as num).toDouble(),
       gender: fields[3] as String,
       activityLevel: fields[4] as String,
-      membershipType: fields[5] as String,
-      memberSince: fields[6] as DateTime,
+      memberSince: (fields[6] ?? fields[5]) as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserProfile obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -93,8 +88,6 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
       ..writeByte(4)
       ..write(obj.activityLevel)
       ..writeByte(5)
-      ..write(obj.membershipType)
-      ..writeByte(6)
       ..write(obj.memberSince);
   }
 }

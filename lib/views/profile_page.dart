@@ -79,39 +79,33 @@ class _ProfilePageState extends State<ProfilePage> {
                           boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20)],
                         ),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  width: 80, height: 80,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
-                                    borderRadius: BorderRadius.circular(24),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: Image.asset(
+                                    'assets/img/credits/lionel_winston_sengkey.jpg',
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
                                   ),
-                                  child: Icon(Icons.person, color: Colors.white, size: 40),
                                 ),
                                 SizedBox(width: 16),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(profile.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                                      Text(profile.membershipType, style: TextStyle(color: Colors.grey[600])),
-                                      SizedBox(height: 4),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: Colors.amber[100],
-                                              borderRadius: BorderRadius.circular(12),
-                                            ),
-                                            child: Text('⭐ Gold', style: TextStyle(color: Colors.amber[700], fontSize: 10)),
-                                          ),
-                                          SizedBox(width: 8),
-                                          Text('Member since ${profile.memberSince.year}', style: TextStyle(color: Colors.grey[600], fontSize: 10)),
-                                        ],
+                                      Text(
+                                        profile.name,
+                                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                                       ),
+                                      Text(
+                                        'Glad to see you back',
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                                      )
                                     ],
                                   ),
                                 ),
@@ -123,8 +117,39 @@ class _ProfilePageState extends State<ProfilePage> {
                               children: [
                                 _buildProfileStat('127', 'Measurements'),
                                 _buildProfileStat('89', 'Days Active'),
-                                _buildProfileStat('15', 'Goals Achieved'),
                               ],
+                            ),
+                            SizedBox(height: 20),
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Color(0xFFEEF2FF),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Text('💬', style: TextStyle(fontSize: 18)),
+                                  ),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Keep it up, ${profile.name.split(' ').first}!', style: TextStyle(fontWeight: FontWeight.w600)),
+                                        SizedBox(height: 2),
+                                        Text('You’re building great habits—stay consistent and celebrate every small win.', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -205,6 +230,8 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+
+  
 
   void _editAge(BuildContext context) {
     showModalBottomSheet(

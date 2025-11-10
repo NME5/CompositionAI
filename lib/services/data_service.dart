@@ -40,12 +40,11 @@ class DataService {
     final existing = _userProfileBox.get(_userProfileKey);
     if (existing != null) return existing;
     final defaultProfile = UserProfile(
-      name: 'Alex Johnson',
+      name: 'Timothy Juwono',
       age: 28,
       height: 175,
       gender: 'Male',
       activityLevel: 'Moderately Active',
-      membershipType: 'Premium Member',
       memberSince: DateTime(2023, 1, 1),
     );
     _userProfileBox.put(_userProfileKey, defaultProfile);
