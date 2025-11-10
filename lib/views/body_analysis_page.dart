@@ -92,12 +92,11 @@ class BodyAnalysisContent extends StatelessWidget {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           textAlign: TextAlign.left,
         ),
-        SizedBox(height: 8),
         Text(
           'Overview of your latest measurement',
           style: TextStyle(color: Colors.grey[600], fontSize: 14),
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 20),
 
         Container(
           padding: EdgeInsets.all(20),
@@ -162,7 +161,7 @@ class BodyAnalysisContent extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Composition breakdown', style: TextStyle(fontWeight: FontWeight.w700)),
-                  SizedBox(height: 25),
+                  SizedBox(height: 30),
                   Center(
                     child: SizedBox(
                       width: 220,
@@ -219,7 +218,6 @@ class BodyAnalysisContent extends StatelessWidget {
               _MetricCard(emoji: '💪', title: 'Muscle Mass', value: '${result.slmKg.toStringAsFixed(1)} kg', subtitle: '${result.slmPercent.toStringAsFixed(1)}%', color: Color(0xFF2A9D8F)),
               _MetricCard(emoji: '🦴', title: 'Bone Mass', value: '${result.boneMassKg.toStringAsFixed(1)} kg', subtitle: 'Skeletal', color: Color(0xFF9E7AE8)),
               _MetricCard(emoji: '🎂', title: 'Body Age', value: '${result.bodyAge}', subtitle: 'years', color: Color(0xFF8D99AE)),
-              _MetricCard(emoji: '⚡', title: 'Impedance', value: '${result.impedanceOhm.toStringAsFixed(0)} Ω', subtitle: 'Ohms', color: Color(0xFFB8E4C9)),
             ],
           ),
         ),

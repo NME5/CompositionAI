@@ -228,7 +228,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                                   label: 'BMR (kcal)', 
                                   change: _viewModel.bmrDeltaText, 
                                   color: Colors.orange,
-                                  progressValue: _viewModel.bmrProgress,
                                 ),
                                 MetricCard(
                                   emoji: '📏', 
@@ -236,7 +235,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                                   label: 'BMI', 
                                   change: _viewModel.bmiDeltaText, 
                                   color: Colors.purple,
-                                  progressValue: _viewModel.bmiProgress,
                                 ),
                               ],
                             ),

@@ -91,12 +91,14 @@ class MetricCard extends StatelessWidget {
           SizedBox(height: 12),
           Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-          SizedBox(height: 8),
-          LinearProgressIndicator(
-            value: progressValue ?? 0.0,
-            backgroundColor: Colors.grey[200],
-            valueColor: AlwaysStoppedAnimation<Color>(color),
-          ),
+          if (progressValue != null) ...[
+            SizedBox(height: 8),
+            LinearProgressIndicator(
+              value: progressValue,
+              backgroundColor: Colors.grey[200],
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+            ),
+          ],
         ],
       ),
     );
