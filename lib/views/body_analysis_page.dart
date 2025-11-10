@@ -78,8 +78,24 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> {
 
 class BodyAnalysisContent extends StatelessWidget {
   final BodyCompositionResult result;
+  final DateTime? measurementDate;
 
-  const BodyAnalysisContent({required this.result});
+  const BodyAnalysisContent({required this.result, this.measurementDate});
+
+  //date for display
+  String _formatDate(DateTime date) {
+    final months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+    final month = months[date.month - 1];
+    final day = date.day;
+    final year = date.year;
+    final hour = date.hour;
+    final minute = date.minute.toString().padLeft(2, '0');
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+    
+    return '$month $day, $year at $displayHour:$minute $period';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +109,7 @@ class BodyAnalysisContent extends StatelessWidget {
           textAlign: TextAlign.left,
         ),
         Text(
-          'Overview of your latest measurement',
+          measurementDate != null ? _formatDate(measurementDate!) : 'Overview of your latest measurement',
           style: TextStyle(color: Colors.grey[600], fontSize: 14),
         ),
         SizedBox(height: 20),

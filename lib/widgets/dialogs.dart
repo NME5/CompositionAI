@@ -23,7 +23,7 @@ class MeasurementDialog extends StatefulWidget {
 }
 
 class BodyAnalysisDialog {
-  static Future<void> show(BuildContext context, {required BodyCompositionResult compositionResult}) async {
+  static Future<void> show(BuildContext context, {required BodyCompositionResult compositionResult, DateTime? measurementDate}) async {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -79,7 +79,7 @@ class BodyAnalysisDialog {
               Expanded(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
-                  child: BodyAnalysisContent(result: compositionResult),
+                  child: BodyAnalysisContent(result: compositionResult, measurementDate: measurementDate),
                 ),
               ),
             ],
@@ -89,7 +89,7 @@ class BodyAnalysisDialog {
     );
   }
 
-  static Future<void> showFullScreen(BuildContext context, {required BodyCompositionResult compositionResult, bool replaceCurrent = false}) async {
+  static Future<void> showFullScreen(BuildContext context, {required BodyCompositionResult compositionResult, bool replaceCurrent = false, DateTime? measurementDate}) async {
     final route = PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 500),
       reverseTransitionDuration: Duration(milliseconds: 250),
@@ -130,7 +130,7 @@ class BodyAnalysisDialog {
                   Expanded(
                     child: SingleChildScrollView(
                       padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
-                      child: BodyAnalysisContent(result: compositionResult),
+                      child: BodyAnalysisContent(result: compositionResult, measurementDate: measurementDate),
                     ),
                   ),
                 ],

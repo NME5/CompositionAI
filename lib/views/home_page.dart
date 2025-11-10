@@ -334,7 +334,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
           bodyAge: bodyAge,
           bmi: bmi,
         );
-        BodyAnalysisDialog.show(context, compositionResult: result);
+        BodyAnalysisDialog.show(context, compositionResult: result, measurementDate: entry.timestamp);
       },
       borderRadius: BorderRadius.circular(16),
       child: Container(

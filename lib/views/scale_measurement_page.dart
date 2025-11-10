@@ -179,11 +179,12 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
     // Navigate to results page with calculated data
     if (mounted) {
       // Pop measurement page, then show an almost-full-screen, draggable bottom sheet over previous screen
+      final measurementTimestamp = DateTime.now();
       Navigator.pop(context);
       Future.microtask(() {
         final ctx = appNavigatorKey.currentContext;
         if (ctx != null) {
-          BodyAnalysisDialog.show(ctx, compositionResult: composition);
+          BodyAnalysisDialog.show(ctx, compositionResult: composition, measurementDate: measurementTimestamp);
         }
       });
     }
