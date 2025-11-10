@@ -51,6 +51,7 @@ class MetricCard extends StatelessWidget {
   final String label;
   final String change;
   final Color color;
+  final double? progressValue;
 
   const MetricCard({
     required this.emoji,
@@ -58,6 +59,7 @@ class MetricCard extends StatelessWidget {
     required this.label,
     required this.change,
     required this.color,
+    this.progressValue,
   });
 
   @override
@@ -91,7 +93,7 @@ class MetricCard extends StatelessWidget {
           Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
           SizedBox(height: 8),
           LinearProgressIndicator(
-            value: 0.7,
+            value: progressValue ?? 0.0,
             backgroundColor: Colors.grey[200],
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),

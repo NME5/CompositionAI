@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/data_service.dart';
+import '../services/body_composition_calculator.dart';
 import '../models/body_metrics.dart';
+import '../models/user_profile.dart';
 
 class AnalyticsViewModel extends ChangeNotifier {
   final List<String> _periods = ['7D', '1M', '3M', '1Y'];
@@ -67,12 +69,38 @@ class AnalyticsViewModel extends ChangeNotifier {
   // Expose other metric values and deltas
   String get muscleMassText => _formatNumber(currentMetrics?.muscleMass, suffix: '%');
   String get muscleDeltaText => _formatDelta(_deltaFor((m) => m.metrics.muscleMass), suffix: '%');
+  double? get muscleMassProgress => currentMetrics?.muscleMass != null ? (currentMetrics!.muscleMass / 100.0).clamp(0.0, 1.0) : null;
+  
   String get waterText => _formatNumber(currentMetrics?.water, suffix: '%');
   String get waterDeltaText => _formatDelta(_deltaFor((m) => m.metrics.water), suffix: '%');
+  double? get waterProgress => currentMetrics?.water != null ? (currentMetrics!.water / 100.0).clamp(0.0, 1.0) : null;
+  
+  String get bodyFatText => bodyFatPercentText;
+  String get bodyFatDeltaCardText => bodyFatDeltaText.isEmpty ? '—' : bodyFatDeltaText;
+  double? get bodyFatProgress => currentMetrics?.bodyFat != null ? (currentMetrics!.bodyFat / 100.0).clamp(0.0, 1.0) : null;
+
   String get boneMassText => _formatNumber(currentMetrics?.boneMass, suffix: 'kg');
   String get boneDeltaText => _formatDelta(_deltaFor((m) => m.metrics.boneMass), suffix: 'kg');
+  // Bone mass as percentage of body weight (typically 2-5%), normalize to 0-10% range for progress
+  double? get boneMassProgress {
+    if (currentMetrics == null) return null;
+    final weight = currentMetrics!.weight;
+    if (weight <= 0) return null;
+    // Calculate bone mass as percentage: (boneMass / weight) * 100
+    final bonePercent = (currentMetrics!.boneMass / weight) * 100.0;
+    // Normalize to 0-10% range to avoid maxing out, clamp to 0-1
+    return (bonePercent / 10.0).clamp(0.0, 1.0);
+  }
+  
   String get bmrText => _formatNumber(currentMetrics?.bmr.toDouble(), fractionDigits: 0);
   String get bmrDeltaText => _formatDelta(_deltaFor((m) => m.metrics.bmr.toDouble()), fractionDigits: 0);
+  // BMR typically ranges from 1200-3000 kcal, normalize to this range
+  double? get bmrProgress {
+    if (currentMetrics == null) return null;
+    final bmr = currentMetrics!.bmr.toDouble();
+    // Normalize to 1200-3000 range, clamp to 0-1
+    return ((bmr - 1200) / (3000 - 1200)).clamp(0.0, 1.0);
+  }
 
   // Helpers
   List<MeasurementEntry> _filteredMeasurementsForSelectedPeriod() {
@@ -105,6 +133,44 @@ class AnalyticsViewModel extends ChangeNotifier {
     final first = selector(filtered.first);
     final last = selector(filtered.last);
     return last - first;
+  }
+
+  // BMI calculations
+  String get bmiText {
+    final bmi = _currentBMI;
+    if (bmi == null) return '--';
+    return bmi.toStringAsFixed(1);
+  }
+
+  String get bmiDeltaText {
+    final heightCm = _userProfile?.height ?? 0;
+    if (heightCm <= 0) return '';
+    final delta = _deltaFor(
+      (entry) => BodyCompositionCalculator.calculateBMI(heightCm.round(), entry.metrics.weight),
+    );
+    return _formatDelta(delta, fractionDigits: 1);
+  }
+
+  double? get bmiProgress {
+    final bmi = _currentBMI;
+    if (bmi == null) return null;
+    // Normalize BMI to 15-40 range
+    return ((bmi - 15.0) / (40.0 - 15.0)).clamp(0.0, 1.0);
+  }
+
+  double? get _currentBMI {
+    final metrics = currentMetrics;
+    final heightCm = _userProfile?.height ?? 0;
+    if (metrics == null || heightCm <= 0) return null;
+    return BodyCompositionCalculator.calculateBMI(heightCm.round(), metrics.weight);
+  }
+
+  UserProfile? get _userProfile {
+    try {
+      return _dataService.getUserProfile();
+    } catch (_) {
+      return null;
+    }
   }
 
   String _formatShortDate(DateTime dt) {
