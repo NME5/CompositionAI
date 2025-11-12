@@ -34,6 +34,28 @@ class DiabetesModelWeights {
     -0.203,  // ActivityScore (negative = higher activity = lower risk)
   ];
 
+  /// Mean value tiap fitur saat training (dipakai buat normalisasi z-score)
+  static const List<double> featureMeans = [
+    27.4,  // BMI rata-rata populasi training
+    26.0,  // BodyFat%
+    12.0,  // VisceralFat
+    39.0,  // MuscleMass (kg)
+    3.2,   // MetabolicAgeDifference
+    0.4,   // WeightTrend14Days
+    0.52,  // ActivityScore
+  ];
+
+  /// Standard deviation tiap fitur saat training (hindari zero)
+  static const List<double> featureStdDevs = [
+    3.6,   // BMI
+    6.5,   // BodyFat%
+    3.8,   // VisceralFat
+    5.2,   // MuscleMass
+    4.1,   // MetabolicAgeDifference
+    1.3,   // WeightTrend14Days
+    0.18,  // ActivityScore
+  ];
+
   /// Nama human-readable buat tiap fitur, biar gampang ditampilkan di UI/debugging
   static const List<String> featureNames = [
     'BMI',
@@ -49,6 +71,9 @@ class DiabetesModelWeights {
   static int get featureCount => featureWeights.length;
 
   /// Quick check: pastikan jumlah weight = jumlah nama fitur
-  static bool get isValid => featureWeights.length == featureNames.length;
+  static bool get isValid =>
+      featureWeights.length == featureNames.length &&
+      featureWeights.length == featureMeans.length &&
+      featureWeights.length == featureStdDevs.length;
 }
 

@@ -69,10 +69,21 @@ class DiabetesModel {
     double sum = DiabetesModelWeights.intercept;
 
     for (int i = 0; i < features.length; i++) {
-      sum += DiabetesModelWeights.featureWeights[i] * features[i];
+      final normalized = _normalizeFeature(features[i], i);
+      sum += DiabetesModelWeights.featureWeights[i] * normalized;
     }
 
     return sum;
+  }
+
+  /// Normalisasi fitur ke skala training (z-score)
+  static double _normalizeFeature(double value, int index) {
+    final mean = DiabetesModelWeights.featureMeans[index];
+    final std = DiabetesModelWeights.featureStdDevs[index];
+    if (std == 0) {
+      return 0.0;
+    }
+    return (value - mean) / std;
   }
 
   /// Sigmoid function: 1 / (1 + e^(-x))
@@ -147,7 +158,8 @@ class DiabetesModel {
     for (int i = 0; i < features.length; i++) {
       final weight = DiabetesModelWeights.featureWeights[i];
       final featureValue = features[i];
-      final contribution = weight * featureValue;
+      final normalizedValue = _normalizeFeature(featureValue, i);
+      final contribution = weight * normalizedValue;
 
       // Hanya mempertimbangkan factor yang meningkatkan risiko (kontribusi positif)
       // Untuk berat negatif (seperti muscle mass, activity), dicek jika
@@ -156,25 +168,15 @@ class DiabetesModel {
       double impact = 0.0;
 
       if (weight > 0) {
-        // Positive weight: higher feature value = higher risk
-        if (featureValue > 0) {
+        // Positive weight: nilai di atas rata-rata (z > 0) = risiko lebih tinggi
+        if (normalizedValue > 0) {
           impact = contribution;
         }
       } else {
-        // Negative weight: lower feature value = higher risk
-        // We calculate the "risk increase" from low values
-        if (weight < 0 && featureValue < 0) {
-          // If feature is negative (e.g., negative activity score), this increases risk
+        // Negative weight: nilai di bawah rata-rata (z < 0) = risiko lebih tinggi
+        if (normalizedValue < 0) {
           impact = contribution.abs();
           factorName = 'Low ${factorName}';
-        } else if (weight < 0) {
-          // For features like muscle mass, low values increase risk
-          // We estimate impact based on deviation from a "healthy" baseline
-          final baseline = _getBaselineValue(i);
-          if (featureValue < baseline) {
-            impact = (baseline - featureValue) * weight.abs();
-            factorName = 'Low ${factorName}';
-          }
         }
       }
 
@@ -199,23 +201,6 @@ class DiabetesModel {
     return topFactors;
   }
 
-  /// Get baseline value untuk fitur (digunakan untuk kalkulasi impact)
-  /// 
-  /// [featureIndex] - Index of the feature
-  /// 
-  /// Returns baseline value untuk perbandingan
-  static double _getBaselineValue(int featureIndex) {
-    // Approximate healthy baselines untuk fitur dengan negative weights
-    switch (featureIndex) {
-      case 3: // Muscle Mass
-        return 40.0; // kg - approximate healthy baseline
-      case 6: // Activity Score
-        return 0.7; // Moderate-high activity
-      default:
-        return 0.0;
-    }
-  }
-
   /// Get feature importance scores untuk semua fitur
   /// 
   /// Digunakan untuk debugging dan memahami behavior model
@@ -229,8 +214,8 @@ class DiabetesModel {
 
     for (int i = 0; i < features.length; i++) {
       final weight = DiabetesModelWeights.featureWeights[i];
-      final featureValue = features[i];
-      final contribution = weight * featureValue;
+      final normalizedValue = _normalizeFeature(features[i], i);
+      final contribution = weight * normalizedValue;
       importance[DiabetesModelWeights.featureNames[i]] = contribution;
     }
 
