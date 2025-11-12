@@ -303,7 +303,7 @@ class _InsightsPageState extends State<InsightsPage> {
                       SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Tidak bisa mengambil analisis AI. Coba lagi dalam beberapa saat.',
+                          'Unable to fetch AI analysis. Please try again shortly.',
                           style: TextStyle(color: Colors.red[700], fontSize: 13),
                         ),
                       ),
@@ -312,7 +312,7 @@ class _InsightsPageState extends State<InsightsPage> {
                 ),
                 TextButton(
                   onPressed: _viewModel.loadAiInsights,
-                  child: Text('Coba Lagi'),
+                  child: Text('Try Again'),
                 ),
               ],
             )
@@ -379,7 +379,7 @@ class _InsightsPageState extends State<InsightsPage> {
                   ],
                 ),
                 SizedBox(height: 20),
-                Text('Top Factors yang paling berpengaruh', style: TextStyle(fontWeight: FontWeight.w600)),
+                Text('Top factors driving your risk', style: TextStyle(fontWeight: FontWeight.w600)),
                 SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
@@ -407,7 +407,7 @@ class _InsightsPageState extends State<InsightsPage> {
                       Icon(Icons.schedule, size: 14, color: Colors.grey[500]),
                       SizedBox(width: 6),
                       Text(
-                        'Terakhir dihitung: ${_formatTimestamp(lastUpdated)}',
+                        'Last calculated: ${_formatTimestamp(lastUpdated)}',
                         style: TextStyle(color: Colors.grey[600], fontSize: 11),
                       ),
                     ],
@@ -420,17 +420,17 @@ class _InsightsPageState extends State<InsightsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Belum ada analisis AI',
+                  'No AI analysis yet',
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Sinkronkan data terbaru dari timbangan untuk melihat analisis risiko kesehatan.',
+                  'Sync your latest scale data to unlock a personalized health risk analysis.',
                   style: TextStyle(color: Colors.grey[700], fontSize: 13),
                 ),
                 TextButton(
                   onPressed: _viewModel.loadAiInsights,
-                  child: Text('Generate Sekarang'),
+                  child: Text('Generate Now'),
                 ),
               ],
             ),
@@ -444,7 +444,7 @@ class _InsightsPageState extends State<InsightsPage> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
                 SizedBox(width: 8),
-                Text('Update terbaru sedang diproses...'),
+                Text('Refreshing with the latest data...'),
               ],
             ),
           ],
@@ -467,11 +467,11 @@ class _InsightsPageState extends State<InsightsPage> {
   String _riskCategoryHeadline(RiskCategory category) {
     switch (category) {
       case RiskCategory.low:
-        return 'Risiko masih aman';
+        return 'Risk is under control';
       case RiskCategory.moderate:
-        return 'Perlu perhatian ekstra';
+        return 'Time to pay closer attention';
       case RiskCategory.high:
-        return 'Fokus ke pencegahan';
+        return 'Prioritize prevention steps';
     }
   }
 
@@ -479,11 +479,11 @@ class _InsightsPageState extends State<InsightsPage> {
     final percentage = (score * 100).toStringAsFixed(1);
     switch (category) {
       case RiskCategory.low:
-        return 'Model menghitung risiko sebesar $percentage%. Tetap pertahankan kebiasaan baik dan monitor berkala.';
+        return 'The model estimates a $percentage% risk. Keep your current habits and continue monitoring.';
       case RiskCategory.moderate:
-        return 'Risikomu berada di zona moderate ($percentage%). Prioritaskan perbaikan pola makan, aktivitas, dan monitoring lebih rutin.';
+        return 'Your risk sits in the moderate range ($percentage%). Focus on improving nutrition, activity, and regular tracking.';
       case RiskCategory.high:
-        return 'Skor risiko cukup tinggi ($percentage%). Disarankan fokus pada intervensi cepat: cek medis, perbaiki nutrisi, dan rutinkan olahraga.';
+        return 'Risk is elevated at $percentage%. Consider medical follow-up, targeted nutrition changes, and consistent training.';
     }
   }
 
@@ -492,13 +492,16 @@ class _InsightsPageState extends State<InsightsPage> {
     final difference = now.difference(time);
 
     if (difference.inMinutes < 1) {
-      return 'baru saja';
+      return 'just now';
     } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} menit lalu';
+      final minutes = difference.inMinutes;
+      return '$minutes minute${minutes == 1 ? '' : 's'} ago';
     } else if (difference.inHours < 24) {
-      return '${difference.inHours} jam lalu';
+      final hours = difference.inHours;
+      return '$hours hour${hours == 1 ? '' : 's'} ago';
     } else {
-      return '${difference.inDays} hari lalu';
+      final days = difference.inDays;
+      return '$days day${days == 1 ? '' : 's'} ago';
     }
   }
 

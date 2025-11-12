@@ -186,49 +186,49 @@ class CreditsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTeamMemberCard({
-    required String name,
-    required String role,
-    required String description,
-    List<Color>? gradientColors,
-  }) {
-    final colors = gradientColors ?? [Color(0xFFFFECD2), Color(0xFFFCB69F)];
+  // Widget _buildTeamMemberCard({
+  //   required String name,
+  //   required String role,
+  //   required String description,
+  //   List<Color>? gradientColors,
+  // }) {
+  //   final colors = gradientColors ?? [Color(0xFFFFECD2), Color(0xFFFCB69F)];
     
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20)],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: colors),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(Icons.person, color: Colors.grey[800], size: 24),
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                SizedBox(height: 4),
-                Text(role, style: TextStyle(color: Color(0xFF667EEA), fontSize: 13, fontWeight: FontWeight.w500)),
-                SizedBox(height: 4),
-                Text(description, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  //   return Container(
+  //     padding: EdgeInsets.all(20),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white.withOpacity(0.95),
+  //       borderRadius: BorderRadius.circular(24),
+  //       boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20)],
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         Container(
+  //           width: 48,
+  //           height: 48,
+  //           decoration: BoxDecoration(
+  //             gradient: LinearGradient(colors: colors),
+  //             borderRadius: BorderRadius.circular(16),
+  //           ),
+  //           child: Icon(Icons.person, color: Colors.grey[800], size: 24),
+  //         ),
+  //         SizedBox(width: 16),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+  //               SizedBox(height: 4),
+  //               Text(role, style: TextStyle(color: Color(0xFF667EEA), fontSize: 13, fontWeight: FontWeight.w500)),
+  //               SizedBox(height: 4),
+  //               Text(description, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildLongTeamMemberCard({
     required String name,
@@ -335,35 +335,35 @@ class CreditsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAcknowledgmentCard({
-    required String title,
-    required String description,
-  }) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.star, color: Colors.amber[600], size: 24),
-          SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                SizedBox(height: 4),
-                Text(description, style: TextStyle(color: Colors.grey[600], fontSize: 12, height: 1.4)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildAcknowledgmentCard({
+  //   required String title,
+  //   required String description,
+  // }) {
+  //   return Container(
+  //     padding: EdgeInsets.all(20),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white.withOpacity(0.95),
+  //       borderRadius: BorderRadius.circular(20),
+  //       boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+  //     ),
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Icon(Icons.star, color: Colors.amber[600], size: 24),
+  //         SizedBox(width: 12),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+  //               SizedBox(height: 4),
+  //               Text(description, style: TextStyle(color: Colors.grey[600], fontSize: 12, height: 1.4)),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
 
