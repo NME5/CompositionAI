@@ -2,6 +2,9 @@ import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../services/body_composition_calculator.dart';
+import '../services/health_threshold_service.dart';
+import '../services/data_service.dart';
+import '../models/user_profile.dart';
 
 class BodyAnalysisPage extends StatefulWidget {
   final BodyCompositionResult? compositionResult;
@@ -65,7 +68,10 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> {
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
-                child: BodyAnalysisContent(result: _result),
+                child: BodyAnalysisContent(
+                  result: _result,
+                  userProfile: DataService().getUserProfile(),
+                ),
               ),
             ),
           ],
@@ -79,8 +85,13 @@ class _BodyAnalysisPageState extends State<BodyAnalysisPage> {
 class BodyAnalysisContent extends StatelessWidget {
   final BodyCompositionResult result;
   final DateTime? measurementDate;
+  final UserProfile userProfile;
 
-  const BodyAnalysisContent({required this.result, this.measurementDate});
+  const BodyAnalysisContent({
+    required this.result,
+    this.measurementDate,
+    required this.userProfile,
+  });
 
   //date for display
   String _formatDate(DateTime date) {
@@ -123,8 +134,8 @@ class BodyAnalysisContent extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 84,
-                height: 84,
+                width: 108,
+                height: 108,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.15),
                   shape: BoxShape.circle,
@@ -132,7 +143,7 @@ class BodyAnalysisContent extends StatelessWidget {
                 child: Center(
                   child: Text(
                     result.weightKg.toStringAsFixed(1),
-                    style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
@@ -146,9 +157,29 @@ class BodyAnalysisContent extends StatelessWidget {
                     SizedBox(height: 8),
                     Row(
                       children: [
-                        _Chip(text: 'BMI ${result.bmi.toStringAsFixed(1)}'),
+                        Flexible(
+                          child: _Chip(
+                            text: 'BMI ${result.bmi.toStringAsFixed(1)}',
+                            status: HealthThresholdService.getBmiStatusText(result.bmi),
+                            isHealthy: HealthThresholdService.getBmiLevel(result.bmi) == 2,
+                          ),
+                        ),
                         SizedBox(width: 8),
-                        _Chip(text: 'BMR ${result.bmr.toStringAsFixed(0)} kcal'),
+                        Flexible(
+                          child: _Chip(
+                            text: 'BMR ${result.bmr.toStringAsFixed(0)} kcal',
+                            status: HealthThresholdService.getBMRStatusText(
+                              bmr: result.bmr,
+                              isMale: userProfile.gender.toLowerCase().contains('male'),
+                              age: userProfile.age,
+                            ),
+                            isHealthy: HealthThresholdService.getBMRLevel(
+                              bmr: result.bmr,
+                              isMale: userProfile.gender.toLowerCase().contains('male'),
+                              age: userProfile.age,
+                            ) == 2,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -228,12 +259,92 @@ class BodyAnalysisContent extends StatelessWidget {
             spacing: 12,
             runSpacing: 12,
             children: [
-              _MetricCard(emoji: '🧈', title: 'Body Fat', value: '${result.bfrPercent.toStringAsFixed(1)}%', subtitle: '${result.fatMassKg.toStringAsFixed(1)} kg', color: Color(0xFFFFC857)),
-              _MetricCard(emoji: '💧', title: 'Water', value: '${result.tfrPercent.toStringAsFixed(1)}%', subtitle: 'Hydration', color: Color(0xFF78C0E0)),
-              _MetricCard(emoji: '⚠️', title: 'Visceral Fat', value: result.vfr.toStringAsFixed(0), subtitle: 'Rating', color: Color(0xFFE76F51)),
-              _MetricCard(emoji: '💪', title: 'Muscle Mass', value: '${result.slmKg.toStringAsFixed(1)} kg', subtitle: '${result.slmPercent.toStringAsFixed(1)}%', color: Color(0xFF2A9D8F)),
-              _MetricCard(emoji: '🦴', title: 'Bone Mass', value: '${result.boneMassKg.toStringAsFixed(1)} kg', subtitle: 'Skeletal', color: Color(0xFF9E7AE8)),
-              _MetricCard(emoji: '🎂', title: 'Body Age', value: '${result.bodyAge}', subtitle: 'years', color: Color(0xFF8D99AE)),
+              _MetricCard(
+                emoji: '🧈',
+                title: 'Body Fat',
+                value: '${result.bfrPercent.toStringAsFixed(1)}%',
+                subtitle: '${result.fatMassKg.toStringAsFixed(1)} kg',
+                color: Color(0xFFFFC857),
+                healthStatus: HealthThresholdService.getBodyFatStatusText(
+                  bodyFatPercent: result.bfrPercent,
+                  isMale: userProfile.gender.toLowerCase().contains('male'),
+                  age: userProfile.age,
+                ),
+                healthLevel: HealthThresholdService.getBodyFatLevel(
+                  bodyFatPercent: result.bfrPercent,
+                  isMale: userProfile.gender.toLowerCase().contains('male'),
+                  age: userProfile.age,
+                ),
+              ),
+              _MetricCard(
+                emoji: '💧',
+                title: 'Water',
+                value: '${result.tfrPercent.toStringAsFixed(1)}%',
+                subtitle: 'Hydration',
+                color: Color(0xFF78C0E0),
+                healthStatus: HealthThresholdService.getWaterStatusText(
+                  waterPercent: result.tfrPercent,
+                  isMale: userProfile.gender.toLowerCase().contains('male'),
+                  age: userProfile.age,
+                ),
+                healthLevel: HealthThresholdService.getWaterLevel(
+                  waterPercent: result.tfrPercent,
+                  isMale: userProfile.gender.toLowerCase().contains('male'),
+                  age: userProfile.age,
+                ),
+              ),
+              _MetricCard(
+                emoji: '⚠️',
+                title: 'Visceral Fat',
+                value: result.vfr.toStringAsFixed(0),
+                subtitle: 'Rating',
+                color: Color(0xFFE76F51),
+                healthStatus: HealthThresholdService.getVisceralFatStatusText(result.vfr),
+                healthLevel: HealthThresholdService.getVisceralFatLevel(result.vfr),
+              ),
+              _MetricCard(
+                emoji: '💪',
+                title: 'Muscle Mass',
+                value: '${result.slmKg.toStringAsFixed(1)} kg',
+                subtitle: '${result.slmPercent.toStringAsFixed(1)}%',
+                color: Color(0xFF2A9D8F),
+                healthStatus: HealthThresholdService.getMuscleStatusText(
+                  musclePercent: result.slmPercent,
+                  isMale: userProfile.gender.toLowerCase().contains('male'),
+                  heightCm: userProfile.height,
+                ),
+                healthLevel: HealthThresholdService.getMuscleLevel(
+                  musclePercent: result.slmPercent,
+                  isMale: userProfile.gender.toLowerCase().contains('male'),
+                  heightCm: userProfile.height,
+                ),
+              ),
+              _MetricCard(
+                emoji: '🦴',
+                title: 'Bone Mass',
+                value: '${result.boneMassKg.toStringAsFixed(1)} kg',
+                subtitle: 'Skeletal',
+                color: Color(0xFF9E7AE8),
+                healthStatus: HealthThresholdService.getBoneMassStatusText(
+                  boneMassKg: result.boneMassKg,
+                  isMale: userProfile.gender.toLowerCase().contains('male'),
+                  age: userProfile.age,
+                ),
+                healthLevel: HealthThresholdService.getBoneMassLevel(
+                  boneMassKg: result.boneMassKg,
+                  isMale: userProfile.gender.toLowerCase().contains('male'),
+                  age: userProfile.age,
+                ),
+              ),
+              _MetricCard(
+                emoji: '🎂',
+                title: 'Body Age',
+                value: '${result.bodyAge}',
+                subtitle: 'years',
+                color: Color(0xFF8D99AE),
+                healthStatus: result.bodyAge <= userProfile.age ? 'Younger' : 'Older',
+                healthLevel: result.bodyAge <= userProfile.age ? 2 : 3,
+              ),
             ],
           ),
         ),
@@ -249,6 +360,8 @@ class _MetricCard extends StatelessWidget {
   final String value;
   final String subtitle;
   final Color color;
+  final String? healthStatus;
+  final int? healthLevel;
 
   const _MetricCard({
     required this.emoji,
@@ -256,10 +369,16 @@ class _MetricCard extends StatelessWidget {
     required this.value,
     required this.subtitle,
     required this.color,
+    this.healthStatus,
+    this.healthLevel,
   });
 
   @override
   Widget build(BuildContext context) {
+    final statusColor = healthLevel != null
+        ? HealthThresholdService.getHealthLevelColor(healthLevel!)
+        : Colors.grey;
+
     return Container(
       width: (MediaQuery.of(context).size.width - 24 - 24 - 16 - 16 - 12) / 2,
       padding: EdgeInsets.all(16),
@@ -272,7 +391,7 @@ class _MetricCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-      children: [
+            children: [
               Text(emoji, style: TextStyle(fontSize: 16)),
               SizedBox(width: 8),
               Expanded(child: Text(title, style: TextStyle(fontWeight: FontWeight.w700))),
@@ -282,6 +401,38 @@ class _MetricCard extends StatelessWidget {
           Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
           SizedBox(height: 4),
           Text(subtitle, style: TextStyle(color: Colors.grey[600], fontSize: 12, fontWeight: FontWeight.w600)),
+          if (healthStatus != null) ...[
+            SizedBox(height: 8),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: statusColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: statusColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  SizedBox(width: 6),
+                  Text(
+                    healthStatus!,
+                    style: TextStyle(
+                      color: statusColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -290,17 +441,56 @@ class _MetricCard extends StatelessWidget {
 
 class _Chip extends StatelessWidget {
   final String text;
-  const _Chip({required this.text});
+  final String? status;
+  final bool? isHealthy;
+
+  const _Chip({
+    required this.text,
+    this.status,
+    this.isHealthy,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(text, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(
+              text,
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 11),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          if (status != null) ...[
+            SizedBox(width: 5),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              decoration: BoxDecoration(
+                color: (isHealthy ?? false)
+                    ? Colors.green.withOpacity(0.3)
+                    : Colors.orange.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                status!,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

@@ -180,6 +180,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         _buildActionRow('Help Center'),
                         _buildActionRow('Privacy Policy'),
                         _buildActionRow('Terms of Service'),
+                        _buildActionRow('Body Standards'),
                         _buildActionRow('Credits', onTap: () {
                           Navigator.push(
                             context,

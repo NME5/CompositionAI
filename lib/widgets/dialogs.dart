@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../views/scale_measurement_page.dart';
 import '../views/body_analysis_page.dart';
 import '../services/body_composition_calculator.dart';
+import '../services/data_service.dart';
 
 class ConnectScaleDialog {
   static void show(BuildContext context, {required Function(String deviceName) onConnected}) {
@@ -79,7 +80,11 @@ class BodyAnalysisDialog {
               Expanded(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
-                  child: BodyAnalysisContent(result: compositionResult, measurementDate: measurementDate),
+                  child: BodyAnalysisContent(
+                    result: compositionResult,
+                    measurementDate: measurementDate,
+                    userProfile: DataService().getUserProfile(),
+                  ),
                 ),
               ),
             ],
@@ -130,7 +135,11 @@ class BodyAnalysisDialog {
                   Expanded(
                     child: SingleChildScrollView(
                       padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
-                      child: BodyAnalysisContent(result: compositionResult, measurementDate: measurementDate),
+                      child: BodyAnalysisContent(
+                        result: compositionResult,
+                        measurementDate: measurementDate,
+                        userProfile: DataService().getUserProfile(),
+                      ),
                     ),
                   ),
                 ],
