@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/diabetes_result.dart';
 import '../viewmodels/insights_view_model.dart';
 import '../services/data_service.dart';
+import '../widgets/shared_widgets.dart';
+import '../widgets/dialogs.dart';
 
 class InsightsPage extends StatefulWidget {
   @override
@@ -56,13 +58,9 @@ class _InsightsPageState extends State<InsightsPage> {
                                 Text('Personalized recommendations', style: TextStyle(color: Colors.grey[600])),
                               ],
                             ),
-                            Container(
-                              width: 48, height: 48,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(colors: [Color(0xFFF093FB), Color(0xFFF5576C)]),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Center(child: Text('🧠', style: TextStyle(fontSize: 20))),
+                            GestureDetector(
+                              onTap: () => ProfileDialog.show(context),
+                              child: const UserProfileAvatar(size: 48),
                             ),
                           ],
                         ),

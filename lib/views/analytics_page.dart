@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../viewmodels/analytics_view_model.dart';
 import '../widgets/shared_widgets.dart';
+import '../widgets/dialogs.dart';
 
 class AnalyticsPage extends StatefulWidget {
   @override
@@ -58,17 +59,9 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                                 ),
                               ],
                             ),
-                            
-                            Container(
-                              width: 48, height: 48,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(colors: [Color.fromARGB(255, 145, 165, 255), Color.fromARGB(255, 108, 51, 164)]),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Center(child: Text('📈', style: TextStyle(fontSize: 18))),
-                              ),
+                            GestureDetector(
+                              onTap: () => ProfileDialog.show(context),
+                              child: const UserProfileAvatar(size: 48),
                             ),
                           ],
                         ),

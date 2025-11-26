@@ -7,7 +7,6 @@ import 'navigation/route_observer.dart';
 import 'views/home_page.dart';
 import 'views/analytics_page.dart';
 import 'views/insights_page.dart';
-import 'views/profile_page.dart';
 import 'widgets/dialogs.dart';
 // import 'services/data_service.dart';
 
@@ -81,7 +80,6 @@ class _MainScreenState extends State<MainScreen> {
                 HomePage(),
                 AnalyticsPage(),
                 InsightsPage(),
-                ProfilePage(),
               ],
             ),
             // _buildFloatingActionButton(), //haruse gabutuh to
@@ -100,7 +98,9 @@ class _MainScreenState extends State<MainScreen> {
       ),
       child: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) {
+          setState(() => _currentIndex = index);
+        },
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -109,10 +109,9 @@ class _MainScreenState extends State<MainScreen> {
         selectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
         unselectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
         items: [
-          BottomNavigationBarItem(icon: Text('📊', style: TextStyle(fontSize: 20)), label: 'Home'),
+          BottomNavigationBarItem(icon: Text('📊', style: TextStyle(fontSize: 20)), label: 'Recent'),
           BottomNavigationBarItem(icon: Text('📈', style: TextStyle(fontSize: 20)), label: 'Analytics'),
           BottomNavigationBarItem(icon: Text('🧠', style: TextStyle(fontSize: 20)), label: 'Insights'),
-          BottomNavigationBarItem(icon: Text('👤', style: TextStyle(fontSize: 20)), label: 'Profile'),
         ],
       ),
     );

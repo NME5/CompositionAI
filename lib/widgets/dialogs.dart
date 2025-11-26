@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../views/scale_measurement_page.dart';
 import '../views/body_analysis_page.dart';
+import '../views/profile_page.dart';
 import '../services/body_composition_calculator.dart';
 import '../services/data_service.dart';
 
@@ -21,6 +22,74 @@ class ConnectScaleDialog {
 class MeasurementDialog extends StatefulWidget {
   @override
   State<MeasurementDialog> createState() => _MeasurementDialogState();
+}
+
+class ProfileDialog {
+  static Future<void> show(BuildContext context) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final screenHeight = MediaQuery.of(ctx).size.height;
+        return Container(
+          height: screenHeight * 0.96,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              // Grab handle
+              Padding(
+                padding: EdgeInsets.only(top: 12, bottom: 8),
+                child: Container(
+                  width: 48,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+              // Header with centered title
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          icon: Icon(Icons.close),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.grey[100],
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          ),
+                        ),
+                        Text(
+                          'Profile',
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(width: 48),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Divider(color: Colors.grey[200], height: 1),
+                  ],
+                ),
+              ),
+              // Profile content scroll
+              Expanded(
+                child: ProfilePage(),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
 class BodyAnalysisDialog {

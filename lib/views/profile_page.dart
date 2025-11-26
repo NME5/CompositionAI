@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../viewmodels/profile_view_model.dart';
 import '../services/data_service.dart';
+import '../widgets/shared_widgets.dart';
+import '../widgets/dialogs.dart';
 import 'credits_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -40,34 +42,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: SingleChildScrollView(
           child: Column(
             children: [
-              // Header
-              Padding(
-                padding: EdgeInsets.fromLTRB(24, 32, 24, 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Profile', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 4),
-                        Text('Personal settings & preferences', style: TextStyle(color: Colors.grey[600])),
-                      ],
-                    ),
-                    Container(
-                      width: 48, height: 48,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [Color(0xFFFFECD2), Color(0xFFFCB69F)]),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Icon(Icons.person, color: Colors.grey[800]),
-                    ),
-                  ],
-                ),
-              ),
-              
-                      // User Info
-                      Padding(
+                  // User Info
+                  Padding(
                         padding: const EdgeInsets.all(24),
                   child: Column(
                     children: [
@@ -85,11 +61,11 @@ class _ProfilePageState extends State<ProfilePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 ClipRRect(
-                                  borderRadius: BorderRadius.circular(24),
+                                  borderRadius: BorderRadius.circular(18),
                                   child: Image.asset(
                                     'assets/img/credits/lionel_winston_sengkey.jpg',
-                                    width: 80,
-                                    height: 80,
+                                    width: 60,
+                                    height: 60,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -110,46 +86,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                 ),
                               ],
-                            ),
-                            SizedBox(height: 24),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                _buildProfileStat('127', 'Measurements'),
-                                _buildProfileStat('89', 'Days Active'),
-                              ],
-                            ),
-                            SizedBox(height: 20),
-                            Container(
-                              width: double.infinity,
-                              padding: EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Color(0xFFEEF2FF),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Text('💬', style: TextStyle(fontSize: 18)),
-                                  ),
-                                  SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Keep it up, ${profile.name.split(' ').first}!', style: TextStyle(fontWeight: FontWeight.w600)),
-                                        SizedBox(height: 2),
-                                        Text('You’re building great habits—stay consistent and celebrate every small win.', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
                             ),
                           ],
                         ),
@@ -179,7 +115,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       _buildInfoSection('Support & Info', [
                         _buildActionRow('Help Center'),
                         _buildActionRow('Privacy Policy'),
-                        _buildActionRow('Terms of Service'),
                         _buildActionRow('Body Standards'),
                         _buildActionRow('Credits', onTap: () {
                           Navigator.push(
@@ -201,15 +136,6 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildProfileStat(String value, String label) {
-    return Column(
-      children: [
-        Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 10)),
-      ],
     );
   }
 

@@ -98,17 +98,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
                                 Text('Smart Body Analysis', style: TextStyle(color:Color.fromRGBO(117, 117, 117, 1))), //grey[600]
                               ],
                             ),
-                            Container(
-                              width: 48, 
-                              height: 48,
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Image(image: AssetImage('assets/img/Logo CompositionAI.png')), 
-                              ),
+                            GestureDetector(
+                              onTap: () => ProfileDialog.show(context),
+                              child: const UserProfileAvatar(size: 48),
                             ),
                           ],
                         ),

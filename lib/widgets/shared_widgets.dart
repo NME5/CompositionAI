@@ -45,6 +45,42 @@ class StatCard extends StatelessWidget {
   }
 }
 
+class UserProfileAvatar extends StatelessWidget {
+  final double size;
+
+  const UserProfileAvatar({
+    super.key,
+    this.size = 48,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      padding: const EdgeInsets.all(2.5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.grey.shade400,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Image.asset(
+          'assets/img/credits/timothy_juwono.jpg',
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+}
+
 class MetricCard extends StatelessWidget {
   final String emoji;
   final String value;
