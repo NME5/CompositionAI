@@ -61,7 +61,7 @@ class UserProfileAvatar extends StatelessWidget {
       padding: const EdgeInsets.all(2.5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: Colors.grey.shade400,
+        color: Colors.grey.shade300,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -152,10 +152,25 @@ class ChartPainter extends CustomPainter {
       return; // not enough data to render a meaningful bar chart
     }
 
-    // Compute bar width and spacing
+    // Layout paddings so bars align nicely with surrounding text
+    const double leftPadding = 16.0;
+    const double rightPadding = 16.0;
+    const double topPadding = 5.0; // leave 5px padding at the very top
+
+    final contentWidth = size.width - leftPadding - rightPadding;
+
+    // Compute bar width, spacing, and dynamic vertical scale
     final barCount = data.length;
-    final barWidth = size.width / (barCount * 1.5); // a bit of spacing between bars
-    final maxBarHeight = size.height;
+    final barWidth = contentWidth / (barCount * 1.5); // a bit of spacing between bars
+    final maxBarHeight = size.height - topPadding;
+
+    // Find max Y so tallest bar reaches the top (dynamic scaling)
+    final maxY = data
+        .map((d) => (d['y']?.toDouble() ?? 0.0))
+        .fold<double>(0.0, (prev, v) => v > prev ? v : prev);
+    if (maxY <= 0) {
+      return;
+    }
 
     final gradient = LinearGradient(
       colors: const [Color(0xFF667EEA), Color(0xFF764BA2)],
@@ -169,7 +184,7 @@ class ChartPainter extends CustomPainter {
       final d = data[i];
       final xValue = d['x']?.toDouble() ?? i.toDouble();
       final normalizedX = barCount == 1 ? 0.5 : (xValue / (barCount - 1));
-      final centerX = normalizedX * size.width;
+      final centerX = leftPadding + normalizedX * contentWidth;
       centers.add(centerX);
     }
 
@@ -181,24 +196,21 @@ class ChartPainter extends CustomPainter {
 
       for (int i = 0; i < barCount - 1; i++) {
         final gapX = (centers[i] + centers[i + 1]) / 2;
-        canvas.drawLine(
-          Offset(gapX, 0),
-          Offset(gapX, maxBarHeight),
-          separatorPaint,
-        );
+        canvas.drawLine(Offset(gapX, 0), Offset(gapX, size.height), separatorPaint);
       }
     }
 
     for (int i = 0; i < barCount; i++) {
       final d = data[i];
-      final yValue = (d['y']?.toDouble() ?? 0.0).clamp(0.0, 1.0);
+      final rawY = d['y']?.toDouble() ?? 0.0;
+      final yValue = (rawY / maxY).clamp(0.0, 1.0); // normalize against maxY
 
       final centerX = centers[i];
 
       final barHeight = maxBarHeight * yValue;
       final rect = Rect.fromLTWH(
         centerX - barWidth / 2,
-        maxBarHeight - barHeight,
+        topPadding + (maxBarHeight - barHeight),
         barWidth,
         barHeight,
       );
@@ -207,11 +219,11 @@ class ChartPainter extends CustomPainter {
         ..style = PaintingStyle.fill
         ..shader = gradient.createShader(rect);
 
-      // Draw bar with slightly rounded top corners using RRect
-      final rrect = RRect.fromRectAndCorners(
+      // Draw bar with uniformly rounded corners using RRect
+      final rrect = RRect.fromRectXY(
         rect,
-        topLeft: const Radius.circular(3),
-        topRight: const Radius.circular(3),
+        3,
+        3,
       );
       canvas.drawRRect(rrect, paint);
     }
