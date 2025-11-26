@@ -148,38 +148,72 @@ class ChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
-
     if (data.length < 2) {
-      return;
+      return; // not enough data to render a meaningful bar chart
     }
 
-    final points = data.map((d) {
-      final xValue = d['x']?.toDouble() ?? 0.0;
-      final yValue = d['y']?.toDouble() ?? 0.0;
-      final x = xValue * (size.width / (data.length - 1));
-      final y = size.height * (1 - yValue);
-      return Offset(x, y);
-    }).toList();
+    // Compute bar width and spacing
+    final barCount = data.length;
+    final barWidth = size.width / (barCount * 1.5); // a bit of spacing between bars
+    final maxBarHeight = size.height;
 
-    paint.shader = LinearGradient(
-      colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-    ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+    final gradient = LinearGradient(
+      colors: const [Color(0xFF667EEA), Color(0xFF764BA2)],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    );
 
-    final path = Path();
-    path.moveTo(points[0].dx, points[0].dy);
-    for (int i = 1; i < points.length; i++) {
-      path.lineTo(points[i].dx, points[i].dy);
+    // Pre-compute bar center positions
+    final List<double> centers = [];
+    for (int i = 0; i < barCount; i++) {
+      final d = data[i];
+      final xValue = d['x']?.toDouble() ?? i.toDouble();
+      final normalizedX = barCount == 1 ? 0.5 : (xValue / (barCount - 1));
+      final centerX = normalizedX * size.width;
+      centers.add(centerX);
     }
-    canvas.drawPath(path, paint);
 
-    final pointPaint = Paint()..style = PaintingStyle.fill;
-    for (int i = 0; i < points.length; i++) {
-      pointPaint.color = i == points.length - 1 ? Color(0xFF764BA2) : Color(0xFF667EEA);
-      canvas.drawCircle(points[i], i == points.length - 1 ? 6 : 4, pointPaint);
+    // Draw subtle vertical separators in the middle of gaps between bars
+    if (barCount > 1) {
+      final separatorPaint = Paint()
+        ..color = Colors.grey.withOpacity(0.18)
+        ..strokeWidth = 1;
+
+      for (int i = 0; i < barCount - 1; i++) {
+        final gapX = (centers[i] + centers[i + 1]) / 2;
+        canvas.drawLine(
+          Offset(gapX, 0),
+          Offset(gapX, maxBarHeight),
+          separatorPaint,
+        );
+      }
+    }
+
+    for (int i = 0; i < barCount; i++) {
+      final d = data[i];
+      final yValue = (d['y']?.toDouble() ?? 0.0).clamp(0.0, 1.0);
+
+      final centerX = centers[i];
+
+      final barHeight = maxBarHeight * yValue;
+      final rect = Rect.fromLTWH(
+        centerX - barWidth / 2,
+        maxBarHeight - barHeight,
+        barWidth,
+        barHeight,
+      );
+
+      final paint = Paint()
+        ..style = PaintingStyle.fill
+        ..shader = gradient.createShader(rect);
+
+      // Draw bar with slightly rounded top corners using RRect
+      final rrect = RRect.fromRectAndCorners(
+        rect,
+        topLeft: const Radius.circular(3),
+        topRight: const Radius.circular(3),
+      );
+      canvas.drawRRect(rrect, paint);
     }
   }
 

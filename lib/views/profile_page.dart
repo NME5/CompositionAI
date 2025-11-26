@@ -63,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(18),
                                   child: Image.asset(
-                                    'assets/img/credits/lionel_winston_sengkey.jpg',
+                                    'assets/img/credits/timothy_juwono.jpg',
                                     width: 60,
                                     height: 60,
                                     fit: BoxFit.cover,
