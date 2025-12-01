@@ -1,3 +1,14 @@
+/// Which formula set to use for body composition calculations.
+/// 
+/// - [standard]: current in-app formulas (from CsAlgoBuilder).
+/// - [okok]: placeholder for OKOK International style formulas.
+///   For now this uses the same implementation as [standard] until
+///   alternative research formulas are added.
+enum CalculationMethod {
+  standard,
+  okok,
+}
+
 /// Body Composition Calculator
 /// Implements the formulas from CsAlgoBuilder for calculating
 /// body composition metrics from weight, impedance, and user profile data.
@@ -202,7 +213,8 @@ class BodyCompositionCalculator {
     return weightKg / (heightM * heightM);
   }
 
-  /// Calculate all body composition metrics at once
+  /// Calculate all body composition metrics at once using the current
+  /// "standard" formula set.
   static BodyCompositionResult calculateAll({
     required double weightKg,
     required double impedanceOhm,
@@ -275,6 +287,29 @@ class BodyCompositionCalculator {
       bmr: bmr,
       bodyAge: bodyAge,
       bmi: bmi,
+    );
+  }
+
+  /// Calculate all body composition metrics using the OKOK
+  /// International style formula set.
+  ///
+  /// NOTE: This currently delegates to [calculateAll] so behaviour is
+  /// identical. Once you have alternative research-backed formulas,
+  /// implement them here and keep [calculateAll] as the original baseline.
+  static BodyCompositionResult calculateAllOkok({
+    required double weightKg,
+    required double impedanceOhm,
+    required int heightCm,
+    required int age,
+    required bool isMale,
+  }) {
+    // TODO: replace with OKOK-specific formulas when available.
+    return calculateAll(
+      weightKg: weightKg,
+      impedanceOhm: impedanceOhm,
+      heightCm: heightCm,
+      age: age,
+      isMale: isMale,
     );
   }
 }

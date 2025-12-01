@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../viewmodels/profile_view_model.dart';
 import '../services/data_service.dart';
+import '../services/body_composition_calculator.dart';
 import '../widgets/shared_widgets.dart';
 import '../widgets/dialogs.dart';
 import 'credits_page.dart';
@@ -106,15 +107,38 @@ class _ProfilePageState extends State<ProfilePage> {
                       // Settings
                       _buildInfoSection('Settings', [
                         _buildSettingRow('Units', _viewModel.selectedUnit, 'Change'),
-                        _buildToggleRow('Notifications', 'Daily reminders enabled', _viewModel.notificationsEnabled),
-                        _buildToggleRow('Research Calculation', 'Measurement for body Composition', _viewModel.dataSyncEnabled),
+                        _buildToggleRow(
+                          'Notifications',
+                          'Daily reminders enabled',
+                          _viewModel.notificationsEnabled,
+                          onChanged: (newValue) {
+                            setState(() {
+                              _viewModel.toggleNotifications(newValue);
+                            });
+                          },
+                        ),
+                        _buildToggleRow(
+                          'Research Calculation',
+                          'Use Research Papern formulas',
+                          _viewModel.useOkokCalculation,
+                          onChanged: (newValue) async {
+                            setState(() {
+                              _viewModel.setUseOkokCalculation(newValue);
+                            });
+                            // When toggle is ON → use Research Calculation (standard)
+                            // When toggle is OFF → use OKOK Calculation
+                            final method = newValue
+                                ? CalculationMethod.standard
+                                : CalculationMethod.okok;
+                            await _dataService.setCalculationMethod(method);
+                          },
+                        ),
                       ]),
                       SizedBox(height: 24),
                       
                       // Support
                       _buildInfoSection('Support & Info', [
                         _buildActionRow('Help Center'),
-                        _buildActionRow('Privacy Policy'),
                         _buildActionRow('Body Standards'),
                         _buildActionRow('Credits', onTap: () {
                           Navigator.push(
@@ -655,7 +679,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildToggleRow(String title, String subtitle, bool value) {
+  Widget _buildToggleRow(String title, String subtitle, bool value,
+      {ValueChanged<bool>? onChanged}) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -670,7 +695,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           Switch(
             value: value,
-            onChanged: (newValue) => _viewModel.toggleNotifications(newValue),
+            onChanged: onChanged,
             activeColor: Colors.blue,
           ),
         ],

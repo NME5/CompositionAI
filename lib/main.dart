@@ -29,6 +29,8 @@ void main() async {
   await Hive.openBox<Device>('boundDeviceBox');
   await Hive.openBox<BodyMetrics>('metricsBox');
   await Hive.openBox<MeasurementEntry>('measurementsBox');
+  // Lightweight app settings (e.g. calculation method)
+  await Hive.openBox('settingsBox');
   
   // // Update nama user di profile
   // final dataService = DataService();

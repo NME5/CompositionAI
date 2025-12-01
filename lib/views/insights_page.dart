@@ -145,33 +145,6 @@ class _InsightsPageState extends State<InsightsPage> {
                         ),
                       ),
                       SizedBox(height: 24),
-                      
-                      // Health Score
-                      Container(
-                        padding: EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.95),
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20)],
-                        ),
-                        child: Column(
-                          children: [
-                            Text('Health Score', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                            SizedBox(height: 24),
-                            _buildHealthScore(healthScore.overall),
-                            SizedBox(height: 24),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                _buildScoreDetail('${healthScore.bodyComp}', 'Body Comp', Colors.green),
-                                _buildScoreDetail('${healthScore.fitness}', 'Fitness', Colors.blue),
-                                _buildScoreDetail('${healthScore.wellness}', 'Wellness', Colors.purple),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 100),
                     ],
                   ),
                 ),

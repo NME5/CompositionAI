@@ -4,6 +4,7 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../models/scale_reading.dart';
 import '../models/user_profile.dart';
 import 'body_composition_calculator.dart';
+import 'data_service.dart';
 
 /// Bluetooth Scale Service
 /// Handles BLE scanning, device connection, and data parsing from scale manufacturer data
@@ -273,18 +274,32 @@ class BluetoothScaleService {
 
     final isMale = userProfile.gender.toLowerCase() == 'male';
 
-    // Apply impedance offset calibration (e.g. +200 Ω) before calculations.
+    // Apply impedance offset calibration before calculations.
     // Adjust this value if you recalibrate the scale in the future.
     const double impedanceOffsetOhm = 400.0;
     final double calibratedImpedance = reading.impedanceOhm + impedanceOffsetOhm;
-    
-    return BodyCompositionCalculator.calculateAll(
-      weightKg: reading.weightKg!,
-      impedanceOhm: calibratedImpedance,
-      heightCm: userProfile.height.toInt(),
-      age: userProfile.age,
-      isMale: isMale,
-    );
+
+    final calcMethod = DataService().getCalculationMethod();
+
+    // When method is standard → use Research Calculation (current formulas)
+    // When method is okok → use OKOK Calculation (new formulas)
+    if (calcMethod == CalculationMethod.standard) {
+      return BodyCompositionCalculator.calculateAll(
+        weightKg: reading.weightKg!,
+        impedanceOhm: calibratedImpedance,
+        heightCm: userProfile.height.toInt(),
+        age: userProfile.age,
+        isMale: isMale,
+      );
+    } else {
+      return BodyCompositionCalculator.calculateAllOkok(
+        weightKg: reading.weightKg!,
+        impedanceOhm: calibratedImpedance,
+        heightCm: userProfile.height.toInt(),
+        age: userProfile.age,
+        isMale: isMale,
+      );
+    }
   }
 
   /// Dispose resources
