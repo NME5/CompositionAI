@@ -134,8 +134,8 @@ class BodyAnalysisContent extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 108,
-                height: 108,
+                width: 124,
+                height: 124,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.15),
                   shape: BoxShape.circle,
@@ -155,30 +155,27 @@ class BodyAnalysisContent extends StatelessWidget {
                     Text('Weight', style: TextStyle(color: Colors.white70, fontSize: 12)),
                     Text('${result.weightKg.toStringAsFixed(1)} kg', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                     SizedBox(height: 8),
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Flexible(
-                          child: _Chip(
-                            text: 'BMI ${result.bmi.toStringAsFixed(1)}',
-                            status: HealthThresholdService.getBmiStatusText(result.bmi),
-                            isHealthy: HealthThresholdService.getBmiLevel(result.bmi) == 2,
-                          ),
+                        _Chip(
+                          text: 'BMI: ${result.bmi.toStringAsFixed(1)}',
+                          status: HealthThresholdService.getBmiStatusText(result.bmi),
+                          isHealthy: HealthThresholdService.getBmiLevel(result.bmi) == 2,
                         ),
-                        SizedBox(width: 8),
-                        Flexible(
-                          child: _Chip(
-                            text: 'BMR ${result.bmr.toStringAsFixed(0)} kcal',
-                            status: HealthThresholdService.getBMRStatusText(
-                              bmr: result.bmr,
-                              isMale: userProfile.gender.toLowerCase().contains('male'),
-                              age: userProfile.age,
-                            ),
-                            isHealthy: HealthThresholdService.getBMRLevel(
-                              bmr: result.bmr,
-                              isMale: userProfile.gender.toLowerCase().contains('male'),
-                              age: userProfile.age,
-                            ) == 2,
+                        SizedBox(height: 8),
+                        _Chip(
+                          text: 'BMR: ${result.bmr.toStringAsFixed(0)} kcal',
+                          status: HealthThresholdService.getBMRStatusText(
+                            bmr: result.bmr,
+                            isMale: userProfile.gender.toLowerCase().contains('male'),
+                            age: userProfile.age,
                           ),
+                          isHealthy: HealthThresholdService.getBMRLevel(
+                            bmr: result.bmr,
+                            isMale: userProfile.gender.toLowerCase().contains('male'),
+                            age: userProfile.age,
+                          ) == 2,
                         ),
                       ],
                     ),
