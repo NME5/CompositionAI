@@ -110,6 +110,19 @@ class BodyAnalysisContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool hasBmi = result.bmi > 0;
+    final bool hasBmr = result.bmr > 0;
+
+    final bool hasBodyFat = result.bfrPercent > 0 && result.fatMassKg > 0;
+    final bool hasWater = result.tfrPercent > 0;
+    final bool hasVisceralFat = result.vfr > 0;
+    final bool hasMuscle = result.slmKg > 0 && result.slmPercent > 0;
+    final bool hasBone = result.boneMassKg > 0;
+    final bool hasBodyAge = result.bodyAge > 0;
+
+    final bool hasAnyCompositionMetric =
+        hasBodyFat || hasWater || hasMuscle || hasBone;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -154,31 +167,35 @@ class BodyAnalysisContent extends StatelessWidget {
                   children: [
                     Text('Weight', style: TextStyle(color: Colors.white70, fontSize: 12)),
                     Text('${result.weightKg.toStringAsFixed(1)} kg', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _Chip(
-                          text: 'BMI: ${result.bmi.toStringAsFixed(1)}',
-                          status: HealthThresholdService.getBmiStatusText(result.bmi),
-                          isHealthy: HealthThresholdService.getBmiLevel(result.bmi) == 2,
-                        ),
-                        SizedBox(height: 8),
-                        _Chip(
-                          text: 'BMR: ${result.bmr.toStringAsFixed(0)} kcal',
-                          status: HealthThresholdService.getBMRStatusText(
-                            bmr: result.bmr,
-                            isMale: userProfile.gender.toLowerCase().contains('male'),
-                            age: userProfile.age,
-                          ),
-                          isHealthy: HealthThresholdService.getBMRLevel(
-                            bmr: result.bmr,
-                            isMale: userProfile.gender.toLowerCase().contains('male'),
-                            age: userProfile.age,
-                          ) == 2,
-                        ),
-                      ],
-                    ),
+                    if (hasBmi || hasBmr) ...[
+                      SizedBox(height: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (hasBmi)
+                            _Chip(
+                              text: 'BMI: ${result.bmi.toStringAsFixed(1)}',
+                              status: HealthThresholdService.getBmiStatusText(result.bmi),
+                              isHealthy: HealthThresholdService.getBmiLevel(result.bmi) == 2,
+                            ),
+                          if (hasBmi && hasBmr) SizedBox(height: 8),
+                          if (hasBmr)
+                            _Chip(
+                              text: 'BMR: ${result.bmr.toStringAsFixed(0)} kcal',
+                              status: HealthThresholdService.getBMRStatusText(
+                                bmr: result.bmr,
+                                isMale: userProfile.gender.toLowerCase().contains('male'),
+                                age: userProfile.age,
+                              ),
+                              isHealthy: HealthThresholdService.getBMRLevel(
+                                bmr: result.bmr,
+                                isMale: userProfile.gender.toLowerCase().contains('male'),
+                                age: userProfile.age,
+                              ) == 2,
+                            ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -188,60 +205,70 @@ class BodyAnalysisContent extends StatelessWidget {
 
         SizedBox(height: 20),
 
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-            child: Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.95),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: Offset(0, 6)),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Composition breakdown', style: TextStyle(fontWeight: FontWeight.w700)),
-                  SizedBox(height: 30),
-                  Center(
-                    child: SizedBox(
-                      width: 220,
-                      height: 220,
-                      child: CustomPaint(
-                        painter: SegmentedRadialPainter(
-                          bodyFatPercent: result.bfrPercent,
-                          musclePercent: result.slmPercent,
-                          waterPercent: result.tfrPercent,
-                          bonePercent: ((result.boneMassKg / result.weightKg) * 100.0),
-                          colors: const {
-                            'fat': Color(0xFFFFC857),
-                            'muscle': Color(0xFF2A9D8F),
-                            'water': Color(0xFF78C0E0),
-                            'bone': Color(0xFF9E7AE8),
-                          },
+        if (hasAnyCompositionMetric)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+              child: Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: Offset(0, 6)),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Composition breakdown', style: TextStyle(fontWeight: FontWeight.w700)),
+                    SizedBox(height: 30),
+                    Center(
+                      child: SizedBox(
+                        width: 220,
+                        height: 220,
+                        child: CustomPaint(
+                          painter: SegmentedRadialPainter(
+                            bodyFatPercent: hasBodyFat ? result.bfrPercent : 0,
+                            musclePercent: hasMuscle ? result.slmPercent : 0,
+                            waterPercent: hasWater ? result.tfrPercent : 0,
+                            bonePercent: hasBone && result.weightKg > 0
+                                ? ((result.boneMassKg / result.weightKg) * 100.0)
+                                : 0,
+                            colors: const {
+                              'fat': Color(0xFFFFC857),
+                              'muscle': Color(0xFF2A9D8F),
+                              'water': Color(0xFF78C0E0),
+                              'bone': Color(0xFF9E7AE8),
+                            },
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 12),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 8,
-                    children: [
-                      _LegendDot(color: Color(0xFFFFC857), label: 'Fat ${result.bfrPercent.toStringAsFixed(1)}%'),
-                      _LegendDot(color: Color(0xFF2A9D8F), label: 'Muscle ${result.slmPercent.toStringAsFixed(1)}%'),
-                      _LegendDot(color: Color(0xFF78C0E0), label: 'Water ${result.tfrPercent.toStringAsFixed(1)}%'),
-                      _LegendDot(color: Color(0xFF9E7AE8), label: 'Bone ${((result.boneMassKg / result.weightKg) * 100.0).toStringAsFixed(1)}%'),
-                    ],
-                  )
-                ],
+                    SizedBox(height: 22),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 8,
+                      children: [
+                        if (hasBodyFat)
+                          _LegendDot(color: Color(0xFFFFC857), label: 'Fat ${result.bfrPercent.toStringAsFixed(1)}%'),
+                        if (hasMuscle)
+                          _LegendDot(color: Color(0xFF2A9D8F), label: 'Muscle ${result.slmPercent.toStringAsFixed(1)}%'),
+                        if (hasWater)
+                          _LegendDot(color: Color(0xFF78C0E0), label: 'Water ${result.tfrPercent.toStringAsFixed(1)}%'),
+                        if (hasBone && result.weightKg > 0)
+                          _LegendDot(
+                            color: Color(0xFF9E7AE8),
+                            label: 'Bone ${((result.boneMassKg / result.weightKg) * 100.0).toStringAsFixed(1)}%',
+                          ),
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
-        ),
 
         Container(
           padding: EdgeInsets.all(16),
@@ -256,92 +283,98 @@ class BodyAnalysisContent extends StatelessWidget {
             spacing: 12,
             runSpacing: 12,
             children: [
-              _MetricCard(
-                emoji: '🧈',
-                title: 'Body Fat',
-                value: '${result.bfrPercent.toStringAsFixed(1)}%',
-                subtitle: '${result.fatMassKg.toStringAsFixed(1)} kg',
-                color: Color(0xFFFFC857),
-                healthStatus: HealthThresholdService.getBodyFatStatusText(
-                  bodyFatPercent: result.bfrPercent,
-                  isMale: userProfile.gender.toLowerCase().contains('male'),
-                  age: userProfile.age,
+              if (hasBodyFat)
+                _MetricCard(
+                  emoji: '🧈',
+                  title: 'Body Fat',
+                  value: '${result.bfrPercent.toStringAsFixed(1)}%',
+                  subtitle: '${result.fatMassKg.toStringAsFixed(1)} kg',
+                  color: Color(0xFFFFC857),
+                  healthStatus: HealthThresholdService.getBodyFatStatusText(
+                    bodyFatPercent: result.bfrPercent,
+                    isMale: userProfile.gender.toLowerCase().contains('male'),
+                    age: userProfile.age,
+                  ),
+                  healthLevel: HealthThresholdService.getBodyFatLevel(
+                    bodyFatPercent: result.bfrPercent,
+                    isMale: userProfile.gender.toLowerCase().contains('male'),
+                    age: userProfile.age,
+                  ),
                 ),
-                healthLevel: HealthThresholdService.getBodyFatLevel(
-                  bodyFatPercent: result.bfrPercent,
-                  isMale: userProfile.gender.toLowerCase().contains('male'),
-                  age: userProfile.age,
+              if (hasWater)
+                _MetricCard(
+                  emoji: '💧',
+                  title: 'Water',
+                  value: '${result.tfrPercent.toStringAsFixed(1)}%',
+                  subtitle: 'Hydration',
+                  color: Color(0xFF78C0E0),
+                  healthStatus: HealthThresholdService.getWaterStatusText(
+                    waterPercent: result.tfrPercent,
+                    isMale: userProfile.gender.toLowerCase().contains('male'),
+                    age: userProfile.age,
+                  ),
+                  healthLevel: HealthThresholdService.getWaterLevel(
+                    waterPercent: result.tfrPercent,
+                    isMale: userProfile.gender.toLowerCase().contains('male'),
+                    age: userProfile.age,
+                  ),
                 ),
-              ),
-              _MetricCard(
-                emoji: '💧',
-                title: 'Water',
-                value: '${result.tfrPercent.toStringAsFixed(1)}%',
-                subtitle: 'Hydration',
-                color: Color(0xFF78C0E0),
-                healthStatus: HealthThresholdService.getWaterStatusText(
-                  waterPercent: result.tfrPercent,
-                  isMale: userProfile.gender.toLowerCase().contains('male'),
-                  age: userProfile.age,
+              if (hasVisceralFat)
+                _MetricCard(
+                  emoji: '⚠️',
+                  title: 'Visceral Fat',
+                  value: result.vfr.toStringAsFixed(0),
+                  subtitle: 'Rating',
+                  color: Color(0xFFE76F51),
+                  healthStatus: HealthThresholdService.getVisceralFatStatusText(result.vfr),
+                  healthLevel: HealthThresholdService.getVisceralFatLevel(result.vfr),
                 ),
-                healthLevel: HealthThresholdService.getWaterLevel(
-                  waterPercent: result.tfrPercent,
-                  isMale: userProfile.gender.toLowerCase().contains('male'),
-                  age: userProfile.age,
+              if (hasMuscle)
+                _MetricCard(
+                  emoji: '💪',
+                  title: 'Muscle Mass',
+                  value: '${result.slmKg.toStringAsFixed(1)} kg',
+                  subtitle: '${result.slmPercent.toStringAsFixed(1)}%',
+                  color: Color(0xFF2A9D8F),
+                  healthStatus: HealthThresholdService.getMuscleStatusText(
+                    musclePercent: result.slmPercent,
+                    isMale: userProfile.gender.toLowerCase().contains('male'),
+                    heightCm: userProfile.height,
+                  ),
+                  healthLevel: HealthThresholdService.getMuscleLevel(
+                    musclePercent: result.slmPercent,
+                    isMale: userProfile.gender.toLowerCase().contains('male'),
+                    heightCm: userProfile.height,
+                  ),
                 ),
-              ),
-              _MetricCard(
-                emoji: '⚠️',
-                title: 'Visceral Fat',
-                value: result.vfr.toStringAsFixed(0),
-                subtitle: 'Rating',
-                color: Color(0xFFE76F51),
-                healthStatus: HealthThresholdService.getVisceralFatStatusText(result.vfr),
-                healthLevel: HealthThresholdService.getVisceralFatLevel(result.vfr),
-              ),
-              _MetricCard(
-                emoji: '💪',
-                title: 'Muscle Mass',
-                value: '${result.slmKg.toStringAsFixed(1)} kg',
-                subtitle: '${result.slmPercent.toStringAsFixed(1)}%',
-                color: Color(0xFF2A9D8F),
-                healthStatus: HealthThresholdService.getMuscleStatusText(
-                  musclePercent: result.slmPercent,
-                  isMale: userProfile.gender.toLowerCase().contains('male'),
-                  heightCm: userProfile.height,
+              if (hasBone)
+                _MetricCard(
+                  emoji: '🦴',
+                  title: 'Bone Mass',
+                  value: '${result.boneMassKg.toStringAsFixed(1)} kg',
+                  subtitle: 'Skeletal',
+                  color: Color(0xFF9E7AE8),
+                  healthStatus: HealthThresholdService.getBoneMassStatusText(
+                    boneMassKg: result.boneMassKg,
+                    isMale: userProfile.gender.toLowerCase().contains('male'),
+                    age: userProfile.age,
+                  ),
+                  healthLevel: HealthThresholdService.getBoneMassLevel(
+                    boneMassKg: result.boneMassKg,
+                    isMale: userProfile.gender.toLowerCase().contains('male'),
+                    age: userProfile.age,
+                  ),
                 ),
-                healthLevel: HealthThresholdService.getMuscleLevel(
-                  musclePercent: result.slmPercent,
-                  isMale: userProfile.gender.toLowerCase().contains('male'),
-                  heightCm: userProfile.height,
+              if (hasBodyAge)
+                _MetricCard(
+                  emoji: '🎂',
+                  title: 'Body Age',
+                  value: '${result.bodyAge}',
+                  subtitle: 'years',
+                  color: Color(0xFF8D99AE),
+                  healthStatus: result.bodyAge <= userProfile.age ? 'Younger' : 'Older',
+                  healthLevel: result.bodyAge <= userProfile.age ? 2 : 3,
                 ),
-              ),
-              _MetricCard(
-                emoji: '🦴',
-                title: 'Bone Mass',
-                value: '${result.boneMassKg.toStringAsFixed(1)} kg',
-                subtitle: 'Skeletal',
-                color: Color(0xFF9E7AE8),
-                healthStatus: HealthThresholdService.getBoneMassStatusText(
-                  boneMassKg: result.boneMassKg,
-                  isMale: userProfile.gender.toLowerCase().contains('male'),
-                  age: userProfile.age,
-                ),
-                healthLevel: HealthThresholdService.getBoneMassLevel(
-                  boneMassKg: result.boneMassKg,
-                  isMale: userProfile.gender.toLowerCase().contains('male'),
-                  age: userProfile.age,
-                ),
-              ),
-              _MetricCard(
-                emoji: '🎂',
-                title: 'Body Age',
-                value: '${result.bodyAge}',
-                subtitle: 'years',
-                color: Color(0xFF8D99AE),
-                healthStatus: result.bodyAge <= userProfile.age ? 'Younger' : 'Older',
-                healthLevel: result.bodyAge <= userProfile.age ? 2 : 3,
-              ),
             ],
           ),
         ),
