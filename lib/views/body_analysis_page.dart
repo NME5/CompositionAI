@@ -287,8 +287,8 @@ class BodyAnalysisContent extends StatelessWidget {
                 _MetricCard(
                   emoji: '🧈',
                   title: 'Body Fat',
-                  value: '${result.bfrPercent.toStringAsFixed(1)}%',
-                  subtitle: '${result.fatMassKg.toStringAsFixed(1)} kg',
+                  value: '${result.fatMassKg.toStringAsFixed(1)} kg',
+                  subtitle: '${result.bfrPercent.toStringAsFixed(1)}%',
                   color: Color(0xFFFFC857),
                   healthStatus: HealthThresholdService.getBodyFatStatusText(
                     bodyFatPercent: result.bfrPercent,
