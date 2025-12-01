@@ -107,7 +107,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       _buildInfoSection('Settings', [
                         _buildSettingRow('Units', _viewModel.selectedUnit, 'Change'),
                         _buildToggleRow('Notifications', 'Daily reminders enabled', _viewModel.notificationsEnabled),
-                        _buildToggleRow('Data Sync', 'Auto-sync with cloud', _viewModel.dataSyncEnabled),
+                        _buildToggleRow('Research Calculation', 'Measurement for body Composition', _viewModel.dataSyncEnabled),
                       ]),
                       SizedBox(height: 24),
                       

@@ -272,10 +272,15 @@ class BluetoothScaleService {
     }
 
     final isMale = userProfile.gender.toLowerCase() == 'male';
+
+    // Apply impedance offset calibration (e.g. +200 Ω) before calculations.
+    // Adjust this value if you recalibrate the scale in the future.
+    const double impedanceOffsetOhm = 400.0;
+    final double calibratedImpedance = reading.impedanceOhm + impedanceOffsetOhm;
     
     return BodyCompositionCalculator.calculateAll(
       weightKg: reading.weightKg!,
-      impedanceOhm: reading.impedanceOhm,
+      impedanceOhm: calibratedImpedance,
       heightCm: userProfile.height.toInt(),
       age: userProfile.age,
       isMale: isMale,
