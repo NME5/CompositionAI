@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../services/bluetooth_scale_service.dart';
 import '../services/data_service.dart';
 import '../models/scale_reading.dart';
-import '../models/body_metrics.dart';
 // import 'body_analysis_page.dart';
 import '../widgets/dialogs.dart';
 import '../navigation/route_observer.dart';
@@ -149,17 +148,16 @@ class _ScaleMeasurementPageState extends State<ScaleMeasurementPage> with Ticker
       return;
     }
     
-    // Persist measurement to history
+    // Persist measurement to history - store raw data (weight + calibrated impedance)
+    // Calculations will be done on-the-fly using current calculation method
     try {
+      // Get calibrated impedance (impedance + offset)
+      const double impedanceOffsetOhm = 400.0;
+      final double calibratedImpedance = _latestReading!.impedanceOhm + impedanceOffsetOhm;
+      
       _dataService.addMeasurement(
-        BodyMetrics(
-          weight: composition.weightKg,
-          muscleMass: composition.slmKg,
-          bodyFat: composition.bfrPercent,
-          water: composition.tfrPercent,
-          boneMass: composition.boneMassKg,
-          bmr: composition.bmr.round(),
-        ),
+        weightKg: composition.weightKg,
+        calibratedImpedanceOhm: calibratedImpedance,
         timestamp: DateTime.now(),
       );
     } catch (e) {

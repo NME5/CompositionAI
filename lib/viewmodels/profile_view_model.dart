@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/user_profile.dart';
-import '../services/data_service.dart';
-import '../services/body_composition_calculator.dart';
 
 class ProfileViewModel extends ChangeNotifier {
   bool _notificationsEnabled = true;
-  bool _useOkokCalculation = false;
   String _selectedUnit = 'Metric (kg, cm)';
   
   // Personal Information - now using UserProfile model
@@ -19,22 +16,9 @@ class ProfileViewModel extends ChangeNotifier {
         gender: 'Male',
         activityLevel: 'Moderately Active',
         memberSince: DateTime.now(),
-      ) {
-    // Initialize calculation method toggle state
-    // When method is standard → toggle is ON (Research Calculation enabled)
-    // When method is okok → toggle is OFF (OKOK Calculation enabled)
-    try {
-      final calcMethod = DataService().getCalculationMethod();
-      _useOkokCalculation = (calcMethod == CalculationMethod.standard);
-    } catch (e) {
-      print('[ProfileViewModel] Error initializing calculation method: $e');
-      // Default to standard (Research Calculation ON)
-      _useOkokCalculation = true;
-    }
-  }
+      );
 
   bool get notificationsEnabled => _notificationsEnabled;
-  bool get useOkokCalculation => _useOkokCalculation;
   String get selectedUnit => _selectedUnit;
   
   // Personal Information getters
@@ -46,11 +30,6 @@ class ProfileViewModel extends ChangeNotifier {
 
   void toggleNotifications(bool value) {
     _notificationsEnabled = value;
-    notifyListeners();
-  }
-
-  void setUseOkokCalculation(bool value) {
-    _useOkokCalculation = value;
     notifyListeners();
   }
 

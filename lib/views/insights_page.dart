@@ -29,7 +29,6 @@ class _InsightsPageState extends State<InsightsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final healthScore = _dataService.getHealthScore();
     final recommendations = _dataService.getRecommendations();
 
     return AnimatedBuilder(
@@ -474,38 +473,5 @@ class _InsightsPageState extends State<InsightsPage> {
       final days = difference.inDays;
       return '$days day${days == 1 ? '' : 's'} ago';
     }
-  }
-
-  Widget _buildHealthScore(int score) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        SizedBox(
-          width: 120,
-          height: 120,
-          child: CircularProgressIndicator(
-            value: score / 100,
-            strokeWidth: 8,
-            backgroundColor: Colors.grey[200],
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-          ),
-        ),
-        Column(
-          children: [
-            Text('$score', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-            Text('Excellent', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildScoreDetail(String score, String label, Color color) {
-    return Column(
-      children: [
-        Text(score, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
-        Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 10)),
-      ],
-    );
   }
 }

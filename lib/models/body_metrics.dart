@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import '../services/body_composition_calculator.dart';
 
 // model untuk data komposisi tubuh
 class BodyMetrics {
@@ -76,14 +77,101 @@ class BodyMetricsAdapter extends TypeAdapter<BodyMetrics> {
   }
 }
 
+/// Raw measurement data - only stores weight and calibrated impedance
+/// Calculations are done on-the-fly using current calculation method
+class RawMeasurementData {
+  final double weightKg;
+  final double calibratedImpedanceOhm; // impedance + offset
+
+  RawMeasurementData({
+    required this.weightKg,
+    required this.calibratedImpedanceOhm,
+  });
+
+  /// Convert to BodyMetrics
+  BodyMetrics toBodyMetrics({
+    required int heightCm,
+    required int age,
+    required bool isMale,
+  }) {
+    final result = BodyCompositionCalculator.calculateAll(
+      weightKg: weightKg,
+      impedanceOhm: calibratedImpedanceOhm,
+      heightCm: heightCm,
+      age: age,
+      isMale: isMale,
+    );
+
+    return BodyMetrics(
+      weight: result.weightKg,
+      muscleMass: result.slmKg,
+      bodyFat: result.bfrPercent,
+      water: result.tfrPercent,
+      boneMass: result.boneMassKg,
+      bmr: result.bmr.round(),
+    );
+  }
+}
+
 class MeasurementEntry {
   final DateTime timestamp;
-  final BodyMetrics metrics;
+  // New: store raw data (weight + calibrated impedance) instead of calculated metrics
+  final RawMeasurementData? rawData;
+  // Keep metrics for backward compatibility with old data
+  final BodyMetrics? metrics;
 
   MeasurementEntry({
     required this.timestamp,
-    required this.metrics,
-  });
+    this.rawData,
+    this.metrics,
+  }) : assert(rawData != null || metrics != null, 'Either rawData or metrics must be provided');
+
+  /// Get BodyMetrics - either from stored metrics (old data) or recalculated from raw data
+  BodyMetrics getBodyMetrics({
+    required int heightCm,
+    required int age,
+    required bool isMale,
+  }) {
+    if (rawData != null) {
+      // New format: recalculate
+      return rawData!.toBodyMetrics(
+        heightCm: heightCm,
+        age: age,
+        isMale: isMale,
+      );
+    }
+    // Old format: return stored metrics (backward compatibility)
+    return metrics!;
+  }
+}
+
+class RawMeasurementDataAdapter extends TypeAdapter<RawMeasurementData> {
+  @override
+  final int typeId = 5;
+
+  @override
+  RawMeasurementData read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{};
+    for (int i = 0; i < numOfFields; i++) {
+      final key = reader.readByte();
+      fields[key] = reader.read();
+    }
+    return RawMeasurementData(
+      weightKg: (fields[0] as num).toDouble(),
+      calibratedImpedanceOhm: (fields[1] as num).toDouble(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, RawMeasurementData obj) {
+    writer
+      ..writeByte(2)
+      ..writeByte(0)
+      ..write(obj.weightKg)
+      ..writeByte(1)
+      ..write(obj.calibratedImpedanceOhm);
+  }
 }
 
 class MeasurementEntryAdapter extends TypeAdapter<MeasurementEntry> {
@@ -98,20 +186,42 @@ class MeasurementEntryAdapter extends TypeAdapter<MeasurementEntry> {
       final key = reader.readByte();
       fields[key] = reader.read();
     }
-    return MeasurementEntry(
-      timestamp: fields[0] as DateTime,
-      metrics: fields[1] as BodyMetrics,
-    );
+    
+    // Check if this is new format (has rawData) or old format (has metrics)
+    if (fields.containsKey(2)) {
+      // New format: has rawData
+      return MeasurementEntry(
+        timestamp: fields[0] as DateTime,
+        rawData: fields[2] as RawMeasurementData,
+      );
+    } else {
+      // Old format: has metrics (backward compatibility)
+      return MeasurementEntry(
+        timestamp: fields[0] as DateTime,
+        metrics: fields[1] as BodyMetrics,
+      );
+    }
   }
 
   @override
   void write(BinaryWriter writer, MeasurementEntry obj) {
-    writer
-      ..writeByte(2)
-      ..writeByte(0)
-      ..write(obj.timestamp)
-      ..writeByte(1)
-      ..write(obj.metrics);
+    if (obj.rawData != null) {
+      // New format: write rawData
+      writer
+        ..writeByte(2)
+        ..writeByte(0)
+        ..write(obj.timestamp)
+        ..writeByte(2)
+        ..write(obj.rawData);
+    } else {
+      // Old format: write metrics (for backward compatibility)
+      writer
+        ..writeByte(2)
+        ..writeByte(0)
+        ..write(obj.timestamp)
+        ..writeByte(1)
+        ..write(obj.metrics);
+    }
   }
 }
 

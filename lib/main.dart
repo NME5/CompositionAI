@@ -25,6 +25,9 @@ void main() async {
   if (!Hive.isAdapterRegistered(4)) {
     Hive.registerAdapter(MeasurementEntryAdapter());
   }
+  if (!Hive.isAdapterRegistered(5)) {
+    Hive.registerAdapter(RawMeasurementDataAdapter());
+  }
   await Hive.openBox<UserProfile>('userProfileBox');
   await Hive.openBox<Device>('boundDeviceBox');
   await Hive.openBox<BodyMetrics>('metricsBox');

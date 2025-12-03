@@ -268,8 +268,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
   }
 
   Widget _buildRecentActivityCardFrom(MeasurementEntry entry, {required int index, required int totalCount, MeasurementEntry? previous}) {
-    final weight = entry.metrics.weight;
-    final prevWeight = previous?.metrics.weight;
+    final profile = _dataService.getUserProfile();
+    final isMale = profile.gender.toLowerCase().startsWith('m');
+    
+    final metrics = entry.getBodyMetrics(
+      heightCm: profile.height.round(),
+      age: profile.age,
+      isMale: isMale,
+    );
+    
+    final weight = metrics.weight;
+    final prevMetrics = previous?.getBodyMetrics(
+      heightCm: profile.height.round(),
+      age: profile.age,
+      isMale: isMale,
+    );
+    final prevWeight = prevMetrics?.weight;
     final weightDelta = prevWeight != null ? (weight - prevWeight) : null;
 
     // Color wheel - cycling through simple colors
@@ -286,46 +300,64 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Rout
     return InkWell(
       onTap: () {
         final profile = _dataService.getUserProfile();
-        final m = entry.metrics;
-        final weightKg = m.weight;
-        final slmKg = m.muscleMass;
-        final bfrPercent = m.bodyFat;
-        final tfrPercent = m.water;
-        final boneMassKg = m.boneMass;
-        final bmr = m.bmr.toDouble();
-        final slmPercent = weightKg > 0 ? (slmKg / weightKg) * 100.0 : 0.0;
-        final fatMassKg = (bfrPercent / 100.0) * weightKg;
-        final bmi = BodyCompositionCalculator.calculateBMI(profile.height.round(), weightKg);
         final isMale = profile.gender.toLowerCase().startsWith('m');
-        final vfr = BodyCompositionCalculator.calculateVFR(
-          heightCm: profile.height.round(),
-          weightKg: weightKg,
-          age: profile.age,
-          isMale: isMale,
-          impedanceOhm: 0.0,
-        );
-        final bodyAge = BodyCompositionCalculator.calculateBodyAge(
-          heightCm: profile.height.round(),
-          weightKg: weightKg,
-          age: profile.age,
-          isMale: isMale,
-          impedanceOhm: 0.0,
-        );
+        
+        BodyCompositionResult result;
+        
+        // If we have raw data, recalculate
+        if (entry.rawData != null) {
+          result = BodyCompositionCalculator.calculateAll(
+            weightKg: entry.rawData!.weightKg,
+            impedanceOhm: entry.rawData!.calibratedImpedanceOhm,
+            heightCm: profile.height.round(),
+            age: profile.age,
+            isMale: isMale,
+          );
+        } else {
+          // Fallback for old data format - reconstruct from stored metrics
+          final m = entry.metrics!;
+          final weightKg = m.weight;
+          final slmKg = m.muscleMass;
+          final bfrPercent = m.bodyFat;
+          final tfrPercent = m.water;
+          final boneMassKg = m.boneMass;
+          final bmr = m.bmr.toDouble();
+          final slmPercent = weightKg > 0 ? (slmKg / weightKg) * 100.0 : 0.0;
+          final fatMassKg = (bfrPercent / 100.0) * weightKg;
+          final bmi = BodyCompositionCalculator.calculateBMI(profile.height.round(), weightKg);
+          
+          // For old data, we don't have impedance, so use 0 (VFR and bodyAge won't be accurate)
+          final vfr = BodyCompositionCalculator.calculateVFR(
+            heightCm: profile.height.round(),
+            weightKg: weightKg,
+            age: profile.age,
+            isMale: isMale,
+            impedanceOhm: 0.0,
+          );
+          final bodyAge = BodyCompositionCalculator.calculateBodyAge(
+            heightCm: profile.height.round(),
+            weightKg: weightKg,
+            age: profile.age,
+            isMale: isMale,
+            impedanceOhm: 0.0,
+          );
 
-        final result = BodyCompositionResult(
-          weightKg: weightKg,
-          impedanceOhm: 0.0,
-          bfrPercent: bfrPercent,
-          fatMassKg: fatMassKg,
-          vfr: vfr,
-          tfrPercent: tfrPercent,
-          slmKg: slmKg,
-          slmPercent: slmPercent,
-          boneMassKg: boneMassKg,
-          bmr: bmr,
-          bodyAge: bodyAge,
-          bmi: bmi,
-        );
+          result = BodyCompositionResult(
+            weightKg: weightKg,
+            impedanceOhm: 0.0,
+            bfrPercent: bfrPercent,
+            fatMassKg: fatMassKg,
+            vfr: vfr,
+            tfrPercent: tfrPercent,
+            slmKg: slmKg,
+            slmPercent: slmPercent,
+            boneMassKg: boneMassKg,
+            bmr: bmr,
+            bodyAge: bodyAge,
+            bmi: bmi,
+          );
+        }
+        
         BodyAnalysisDialog.show(context, compositionResult: result, measurementDate: entry.timestamp);
       },
       borderRadius: BorderRadius.circular(16),

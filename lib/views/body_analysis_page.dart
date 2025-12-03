@@ -136,7 +136,7 @@ class BodyAnalysisContent extends StatelessWidget {
           measurementDate != null ? _formatDate(measurementDate!) : 'Overview of your latest measurement',
           style: TextStyle(color: Colors.grey[600], fontSize: 14),
         ),
-        SizedBox(height: 20),
+        SizedBox(height: 8),
 
         Container(
           padding: EdgeInsets.all(20),
@@ -234,7 +234,7 @@ class BodyAnalysisContent extends StatelessWidget {
                             musclePercent: hasMuscle ? result.slmPercent : 0,
                             waterPercent: hasWater ? result.tfrPercent : 0,
                             bonePercent: hasBone && result.weightKg > 0
-                                ? ((result.boneMassKg / result.weightKg) * 100.0)
+                                ? ((result.boneMassKg / result.weightKg) * 100.0).clamp(8.0, 16.0)
                                 : 0,
                             colors: const {
                               'fat': Color(0xFFFFC857),
@@ -257,10 +257,10 @@ class BodyAnalysisContent extends StatelessWidget {
                           _LegendDot(color: Color(0xFF2A9D8F), label: 'Muscle ${result.slmPercent.toStringAsFixed(1)}%'),
                         if (hasWater)
                           _LegendDot(color: Color(0xFF78C0E0), label: 'Water ${result.tfrPercent.toStringAsFixed(1)}%'),
-                        if (hasBone && result.weightKg > 0)
+                          if (hasBone && result.weightKg > 0)
                           _LegendDot(
                             color: Color(0xFF9E7AE8),
-                            label: 'Bone ${((result.boneMassKg / result.weightKg) * 100.0).toStringAsFixed(1)}%',
+                            label: 'Bone ${((result.boneMassKg / result.weightKg) * 100.0).clamp(8.0, 16.0).toStringAsFixed(1)}%',
                           ),
                       ],
                     )

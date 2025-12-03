@@ -2,7 +2,6 @@ import '../models/body_metrics.dart';
 import '../models/user_profile.dart';
 import '../models/insight.dart';
 import '../models/device.dart';
-import '../services/body_composition_calculator.dart';
 import 'package:hive/hive.dart';
 
 class DataService {
@@ -14,19 +13,6 @@ class DataService {
   static const String _userProfileKey = 'profile';
 
   Box<UserProfile> get _userProfileBox => Hive.box<UserProfile>(_userProfileBoxName);
-
-  // Lightweight app-wide settings (no adapter required)
-  static const String _settingsBoxName = 'settingsBox';
-  static const String _calcMethodKey = 'calculationMethod';
-  Box get _settingsBox {
-    if (!Hive.isBoxOpen(_settingsBoxName)) {
-      throw Exception(
-        'settingsBox must be opened in main.dart before use. '
-        'Please restart the app (not just hot reload) if you see this error.'
-      );
-    }
-    return Hive.box(_settingsBoxName);
-  }
 
   static const String _boundDeviceBoxName = 'boundDeviceBox';
   static const String _boundDeviceKey = 'device';
@@ -69,25 +55,6 @@ class DataService {
     await _userProfileBox.put(_userProfileKey, profile);
   }
 
-  // Calculation method (standard vs OKOK)
-  CalculationMethod getCalculationMethod() {
-    try {
-      final stored = _settingsBox.get(_calcMethodKey);
-      if (stored is int &&
-          stored >= 0 &&
-          stored < CalculationMethod.values.length) {
-        return CalculationMethod.values[stored];
-      }
-    } catch (e) {
-      print('[DataService] Error reading calculation method: $e');
-    }
-    return CalculationMethod.standard;
-  }
-
-  Future<void> setCalculationMethod(CalculationMethod method) async {
-    await _settingsBox.put(_calcMethodKey, method.index);
-  }
-
   // Update user profile name
   Future<void> updateUserName(String newName) async {
     final existing = _userProfileBox.get(_userProfileKey);
@@ -127,8 +94,26 @@ class DataService {
     await _metricsBox.clear();
   }
 
-  // Timestamped measurements (preferred)
-  Future<void> addMeasurement(BodyMetrics metrics, {DateTime? timestamp}) async {
+  // Timestamped measurements - stores raw data (weight + calibrated impedance)
+  // Calculations are done on-the-fly using current calculation method
+  Future<void> addMeasurement({
+    required double weightKg,
+    required double calibratedImpedanceOhm,
+    DateTime? timestamp,
+  }) async {
+    final rawData = RawMeasurementData(
+      weightKg: weightKg,
+      calibratedImpedanceOhm: calibratedImpedanceOhm,
+    );
+    final entry = MeasurementEntry(
+      timestamp: timestamp ?? DateTime.now(),
+      rawData: rawData,
+    );
+    await _measurementsBox.add(entry);
+  }
+
+  // Legacy method for backward compatibility
+  Future<void> addMeasurementLegacy(BodyMetrics metrics, {DateTime? timestamp}) async {
     final entry = MeasurementEntry(
       timestamp: timestamp ?? DateTime.now(),
       metrics: metrics,

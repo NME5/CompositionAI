@@ -15,7 +15,14 @@ class AnalyticsViewModel extends ChangeNotifier {
 
   BodyMetrics? get currentMetrics {
     if (_allMeasurements.isNotEmpty) {
-      return _allMeasurements.last.metrics;
+      final profile = _userProfile;
+      if (profile == null) return null;
+      final isMale = profile.gender.toLowerCase().startsWith('m');
+      return _allMeasurements.last.getBodyMetrics(
+        heightCm: profile.height.round(),
+        age: profile.age,
+        isMale: isMale,
+      );
     }
     // Fallback to current metrics if no history yet
     return _dataService.getCurrentMetrics();
@@ -39,10 +46,19 @@ class AnalyticsViewModel extends ChangeNotifier {
   List<Map<String, num>> get chartData {
     final filtered = _filteredMeasurementsForSelectedPeriod();
     if (filtered.isEmpty) return [];
+    final profile = _userProfile;
+    if (profile == null) return [];
+    final isMale = profile.gender.toLowerCase().startsWith('m');
+    
     // Plot body fat percentage as 0..1
     return List.generate(filtered.length, (i) {
       final m = filtered[i];
-      final y = (m.metrics.bodyFat) / 100.0;
+      final metrics = m.getBodyMetrics(
+        heightCm: profile.height.round(),
+        age: profile.age,
+        isMale: isMale,
+      );
+      final y = (metrics.bodyFat) / 100.0;
       return {'x': i, 'y': y};
     });
   }
@@ -60,7 +76,17 @@ class AnalyticsViewModel extends ChangeNotifier {
   }
 
   String get bodyFatDeltaText {
-    final delta = _deltaFor((m) => m.metrics.bodyFat);
+    final delta = _deltaFor((m) {
+      final profile = _userProfile;
+      if (profile == null) return 0.0;
+      final isMale = profile.gender.toLowerCase().startsWith('m');
+      final metrics = m.getBodyMetrics(
+        heightCm: profile.height.round(),
+        age: profile.age,
+        isMale: isMale,
+      );
+      return metrics.bodyFat;
+    });
     if (delta == null) return '';
     final arrow = delta >= 0 ? '↑' : '↓';
     return '$arrow ${delta.abs().toStringAsFixed(1)}%';
@@ -68,11 +94,31 @@ class AnalyticsViewModel extends ChangeNotifier {
 
   // Expose other metric values and deltas
   String get muscleMassText => _formatNumber(currentMetrics?.muscleMass, suffix: '%');
-  String get muscleDeltaText => _formatDelta(_deltaFor((m) => m.metrics.muscleMass), suffix: '%');
+  String get muscleDeltaText => _formatDelta(_deltaFor((m) {
+    final profile = _userProfile;
+    if (profile == null) return 0.0;
+    final isMale = profile.gender.toLowerCase().startsWith('m');
+    final metrics = m.getBodyMetrics(
+      heightCm: profile.height.round(),
+      age: profile.age,
+      isMale: isMale,
+    );
+    return metrics.muscleMass;
+  }), suffix: '%');
   double? get muscleMassProgress => currentMetrics?.muscleMass != null ? (currentMetrics!.muscleMass / 100.0).clamp(0.0, 1.0) : null;
   
   String get waterText => _formatNumber(currentMetrics?.water, suffix: '%');
-  String get waterDeltaText => _formatDelta(_deltaFor((m) => m.metrics.water), suffix: '%');
+  String get waterDeltaText => _formatDelta(_deltaFor((m) {
+    final profile = _userProfile;
+    if (profile == null) return 0.0;
+    final isMale = profile.gender.toLowerCase().startsWith('m');
+    final metrics = m.getBodyMetrics(
+      heightCm: profile.height.round(),
+      age: profile.age,
+      isMale: isMale,
+    );
+    return metrics.water;
+  }), suffix: '%');
   double? get waterProgress => currentMetrics?.water != null ? (currentMetrics!.water / 100.0).clamp(0.0, 1.0) : null;
   
   String get bodyFatText => bodyFatPercentText;
@@ -80,7 +126,17 @@ class AnalyticsViewModel extends ChangeNotifier {
   double? get bodyFatProgress => currentMetrics?.bodyFat != null ? (currentMetrics!.bodyFat / 100.0).clamp(0.0, 1.0) : null;
 
   String get boneMassText => _formatNumber(currentMetrics?.boneMass, suffix: 'kg');
-  String get boneDeltaText => _formatDelta(_deltaFor((m) => m.metrics.boneMass), suffix: 'kg');
+  String get boneDeltaText => _formatDelta(_deltaFor((m) {
+    final profile = _userProfile;
+    if (profile == null) return 0.0;
+    final isMale = profile.gender.toLowerCase().startsWith('m');
+    final metrics = m.getBodyMetrics(
+      heightCm: profile.height.round(),
+      age: profile.age,
+      isMale: isMale,
+    );
+    return metrics.boneMass;
+  }), suffix: 'kg');
   // Bone mass as percentage of body weight (typically 2-5%), normalize to 0-10% range for progress
   double? get boneMassProgress {
     if (currentMetrics == null) return null;
@@ -93,7 +149,17 @@ class AnalyticsViewModel extends ChangeNotifier {
   }
   
   String get bmrText => _formatNumber(currentMetrics?.bmr.toDouble(), fractionDigits: 0);
-  String get bmrDeltaText => _formatDelta(_deltaFor((m) => m.metrics.bmr.toDouble()), fractionDigits: 0);
+  String get bmrDeltaText => _formatDelta(_deltaFor((m) {
+    final profile = _userProfile;
+    if (profile == null) return 0.0;
+    final isMale = profile.gender.toLowerCase().startsWith('m');
+    final metrics = m.getBodyMetrics(
+      heightCm: profile.height.round(),
+      age: profile.age,
+      isMale: isMale,
+    );
+    return metrics.bmr.toDouble();
+  }), fractionDigits: 0);
   // BMR typically ranges from 1200-3000 kcal, normalize to this range
   double? get bmrProgress {
     if (currentMetrics == null) return null;
@@ -143,10 +209,19 @@ class AnalyticsViewModel extends ChangeNotifier {
   }
 
   String get bmiDeltaText {
-    final heightCm = _userProfile?.height ?? 0;
-    if (heightCm <= 0) return '';
+    final profile = _userProfile;
+    final heightCm = profile?.height ?? 0;
+    if (heightCm <= 0 || profile == null) return '';
+    final isMale = profile.gender.toLowerCase().startsWith('m');
     final delta = _deltaFor(
-      (entry) => BodyCompositionCalculator.calculateBMI(heightCm.round(), entry.metrics.weight),
+      (entry) {
+        final metrics = entry.getBodyMetrics(
+          heightCm: profile.height.round(),
+          age: profile.age,
+          isMale: isMale,
+        );
+        return BodyCompositionCalculator.calculateBMI(heightCm.round(), metrics.weight);
+      },
     );
     return _formatDelta(delta, fractionDigits: 1);
   }

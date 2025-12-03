@@ -91,7 +91,13 @@ class DiabetesRiskService {
     if (measurements.isNotEmpty) {
       // Sort by timestamp and get most recent
       measurements.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      return measurements.first.metrics;
+      final profile = _dataService.getUserProfile();
+      final isMale = profile.gender.toLowerCase().startsWith('m');
+      return measurements.first.getBodyMetrics(
+        heightCm: profile.height.round(),
+        age: profile.age,
+        isMale: isMale,
+      );
     }
     // Fallback to default current metrics
     return _dataService.getCurrentMetrics();
@@ -168,8 +174,22 @@ class DiabetesRiskService {
 
     // Get oldest and newest weights in the period
     recentMeasurements.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    final oldestWeight = recentMeasurements.first.metrics.weight;
-    final newestWeight = recentMeasurements.last.metrics.weight;
+    final profile = _dataService.getUserProfile();
+    final isMale = profile.gender.toLowerCase().startsWith('m');
+    
+    final oldestMetrics = recentMeasurements.first.getBodyMetrics(
+      heightCm: profile.height.round(),
+      age: profile.age,
+      isMale: isMale,
+    );
+    final newestMetrics = recentMeasurements.last.getBodyMetrics(
+      heightCm: profile.height.round(),
+      age: profile.age,
+      isMale: isMale,
+    );
+    
+    final oldestWeight = oldestMetrics.weight;
+    final newestWeight = newestMetrics.weight;
 
     // Calculate trend (positive = weight gain, negative = weight loss)
     return newestWeight - oldestWeight;
