@@ -232,7 +232,7 @@ class BodyAnalysisContent extends StatelessWidget {
                           painter: SegmentedRadialPainter(
                             bodyFatPercent: hasBodyFat ? result.bfrPercent : 0,
                             musclePercent: hasMuscle ? result.slmPercent : 0,
-                            waterPercent: hasWater ? result.tfrPercent : 0,
+                            waterPercent: 0, // Water removed from gauge
                             bonePercent: hasBone && result.weightKg > 0
                                 ? ((result.boneMassKg / result.weightKg) * 100.0).clamp(8.0, 16.0)
                                 : 0,
@@ -255,8 +255,7 @@ class BodyAnalysisContent extends StatelessWidget {
                           _LegendDot(color: Color(0xFFFFC857), label: 'Fat ${result.bfrPercent.toStringAsFixed(1)}%'),
                         if (hasMuscle)
                           _LegendDot(color: Color(0xFF2A9D8F), label: 'Muscle ${result.slmPercent.toStringAsFixed(1)}%'),
-                        if (hasWater)
-                          _LegendDot(color: Color(0xFF78C0E0), label: 'Water ${result.tfrPercent.toStringAsFixed(1)}%'),
+                        // Water removed from gauge legend
                           if (hasBone && result.weightKg > 0)
                           _LegendDot(
                             color: Color(0xFF9E7AE8),

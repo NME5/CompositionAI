@@ -135,7 +135,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         }),
                         _buildActionRow('Sign Out', color: Colors.red),
                       ]),
-                      SizedBox(height: 100),
+                      SizedBox(height: 100 + MediaQuery.of(context).padding.bottom),
                           ],
                         ),
                       ),
@@ -266,7 +266,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 // Save button
                 Padding(
-                  padding: EdgeInsets.all(24),
+                  padding: EdgeInsets.only(
+                    left: 24,
+                    right: 24,
+                    top: 24,
+                    bottom: 24 + MediaQuery.of(context).padding.bottom,
+                  ),
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -389,7 +394,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 // Save button
                 Padding(
-                  padding: EdgeInsets.all(24),
+                  padding: EdgeInsets.only(
+                    left: 24,
+                    right: 24,
+                    top: 24,
+                    bottom: 24 + MediaQuery.of(context).padding.bottom,
+                  ),
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -453,7 +463,11 @@ class _ProfilePageState extends State<ProfilePage> {
             // Gender options
             Expanded(
               child: ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.only(
+                  left: 24,
+                  right: 24,
+                  bottom: MediaQuery.of(context).padding.bottom,
+                ),
                 itemCount: genders.length,
                 itemBuilder: (context, index) {
                   final gender = genders[index];
@@ -534,7 +548,11 @@ class _ProfilePageState extends State<ProfilePage> {
             // Activity level options
             Expanded(
               child: ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.only(
+                  left: 24,
+                  right: 24,
+                  bottom: MediaQuery.of(context).padding.bottom,
+                ),
                 itemCount: activityLevels.length,
                 itemBuilder: (context, index) {
                   final level = activityLevels[index];
